@@ -11,14 +11,28 @@ The philosophy is restraint: make the smallest useful product that works, then p
 - Three opt-in brand presets modeled on Linear, Vercel, and Notion.
 - Tailwind v3 and v4 configs plus shadcn/ui setup with `cssVariables` enabled.
 - Bundled icon starter sets (Lucide, Simple Icons, Tabler) and 42 React Bits background components.
-- A detect-first onboarding flow that inspects existing code, captures a `.startup-kit/intake.md` source of truth, and routes greenfield or existing projects to the right path.
+- A guided onboarding flow: a thorough interview for new repos and detect-first gap analysis for existing code, captured in a `.startup-kit/intake.md` source of truth, that ends by scaffolding and wiring the product.
 - A layered Node/TypeScript/Express backend reference, plus a monorepo pattern for keeping the frontend and backend in one repo while hosting them on different platforms (Vercel + Supabase + Koyeb).
 - Focused reference docs covering forms, states, accessibility, layout, copy, auth, payments, SEO, analytics, backend, and deployment.
 - One-command scaffolds (single app or monorepo) and a mechanical pre-flight quality gate.
 
-## Quick start
+## No coding experience? Start here
 
-Start with onboarding — it inspects any existing code, asks only what it can't infer (style + architecture), writes a `.startup-kit/intake.md` source of truth, and routes you to the right path. Point your agent at `references/onboarding.md`, or run the scan directly:
+You do not need to know how to code, what a "framework" is, or any of the words in this README. The kit is built so an AI agent does the work and walks you through it in plain English.
+
+1. Open this project in an AI coding tool (Cursor, Claude Code, or similar).
+2. Type this, in your own words:
+
+   > **"Use the startup kit to build my app. Ask me questions and guide me."**
+
+3. Answer the questions it asks. They're plain ("Who is this for?", "Should people log in?", "Does it take money?"). If you don't know an answer, just say **"you pick"** or **"whatever's easiest"** — it will choose the sensible option and tell you what it picked.
+4. When it needs you to create an account somewhere (for example to store data or take payments), it will tell you exactly what to click, step by step. Nothing is assumed.
+
+That's it. The agent figures out the rest, builds the app, and gets it ready to go live.
+
+## Quick start (for developers)
+
+Start with onboarding. For a new repo it interviews you through every decision a product needs (product, scope, style, architecture, data, auth, payments, integrations, launch surfaces, deployment), writes a `.startup-kit/intake.md` source of truth, and then scaffolds and wires the build. For existing code it detects first and only asks what it can't infer. Point your agent at `references/onboarding.md`, or run the scan directly:
 
 ```bash
 scripts/scan-project.sh        # read-only inventory of the current project
@@ -92,7 +106,7 @@ scripts/                     create-app and asset/font/skill download helpers
 
 | File | Covers |
 | --- | --- |
-| `onboarding.md` | Detect-first intake: scan, style, architecture, gap analysis |
+| `onboarding.md` | Guided intake: scan, full interview, gap analysis, build blueprint |
 | `minimal-product.md` | The product doctrine: one user, one job, one workflow |
 | `tailwind-shadcn.md` | Tailwind token mapping and shadcn/ui setup |
 | `theming.md` | Light/dark tokens and class-based dark mode |
@@ -110,6 +124,7 @@ scripts/                     create-app and asset/font/skill download helpers
 | `payments.md` | Stripe checkout, webhooks, entitlements |
 | `seo.md` | Metadata, OG images, error/not-found pages |
 | `analytics.md` | Privacy-respecting product analytics |
+| `single-app.md` | Default architecture: Next.js Route Handlers + Supabase |
 | `backend.md` | Layered Node/TypeScript/Express API structure |
 | `monorepo.md` | One repo, split hosting (Vercel + Supabase + Koyeb) |
 | `legal.md` | Privacy policy and terms templates |

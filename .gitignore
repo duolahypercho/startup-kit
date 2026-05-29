@@ -1,0 +1,23 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+*.swp
+
+# Node (in case scripts are run from inside the kit during testing)
+node_modules/
+.next/
+dist/
+.turbo/
+.vercel
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+
+# Local intake artifact (kept per-project, not in the kit itself)
+.startup-kit/

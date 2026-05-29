@@ -13,9 +13,16 @@ Before building, state the one user, the one job, and the one primary workflow i
 
 ## Onboarding
 
-Read `references/onboarding.md` and run it first on any new engagement, before scaffolding or editing.
+Read `references/onboarding.md` and run it first on any new engagement, before scaffolding or editing. This is the "guide me and build the whole thing" entry point.
 
-Onboarding is the entry point that routes a user to the one path that fits them. Detect first, then ask: run `scripts/scan-project.sh` to inventory any existing code, report what was found, and only ask what cannot be inferred (style and the architecture choice). For existing frontends or backends, inspect the code and write down its file structure plus a concrete gap analysis against the kit's conventions — never modify source during onboarding. Capture everything in `.startup-kit/intake.md` (from `assets/templates/intake.md`); it is the source of truth every later session reads.
+Onboarding adapts to the starting state. Always begin with `scripts/scan-project.sh` to inventory the working directory (read-only). Then branch:
+
+- **Greenfield (new/empty repo):** there is nothing to detect, so **interview thoroughly**. Walk the user through the grouped question bank in `references/onboarding.md` (product, scope, style, architecture, data, auth, payments, integrations, launch surfaces, deployment) — asking in batches with a recommended default per choice — then scaffold and wire the product step by step.
+- **Existing code:** **detect first, then ask.** Report what the scan found, only ask what cannot be inferred, and write down the existing file structure plus a concrete gap analysis against the kit's conventions. Never modify source during the intake phase.
+
+Assume the user may have **no technical background**. Ask in plain English, put any jargon in parentheses, explain terms in one line, and offer a "you pick the sensible default" path for every choice so they can build a real product without knowing the words. Never ask them to do setup themselves — when an account or key is needed, give exact step-by-step instructions. See the "Assume the user is not technical" section in `references/onboarding.md`.
+
+Capture everything in `.startup-kit/intake.md` (from `assets/templates/intake.md`); it is the source of truth every later session reads, and its plan checklist tracks build progress so a re-run resumes rather than restarts.
 
 Present the architecture as an explicit choice and **default to the single app**:
 
@@ -151,9 +158,15 @@ Read `references/content.md` before writing example data, empty states, or socia
 
 Use realistic, specific content even in examples. No generic names ("John Doe"), slop brand names ("Acme"), fake-perfect numbers (`99.99%`), text-only logo walls, `<div>`-based fake screenshots, or em dashes. Use the bundled Simple Icons for real brand logos.
 
+## Single App (Default Architecture)
+
+Read `references/single-app.md` before building the default single-app product.
+
+The default for most products is one Next.js App Router app on Vercel with Route Handlers as the API edge and Supabase for data, auth, and storage. Keep the same one-directional discipline as the layered backend — Route Handler → Service → Supabase — with `zod` validation at the edge, the shared response envelope, server-only secrets, and Row Level Security in the database. Scaffold it with `scripts/create-app.sh <name>`. Only move to the monorepo when a Route Handler can no longer do the job.
+
 ## Backend
 
-Read `references/backend.md` before building a backend, designing API routes, or wiring a database.
+Read `references/backend.md` before building a standalone backend (the monorepo/always-on path), designing API routes, or wiring a database.
 
 Build the backend as a Node.js + TypeScript + Express service with a strict layered flow: Router → Controller → Service → Model, and back. Controllers own HTTP (`req`/`res`) and shape responses; services own business logic and database access; models hold only the Mongoose schema and its type. Use one file per domain per layer, a single JSON response envelope (`{ success, status, code, message/error, data }`), authentication in middleware, and keep all secrets in `.env`.
 
