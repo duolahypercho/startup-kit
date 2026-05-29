@@ -1,8 +1,24 @@
 # Startup Kit
 
-A cross-agent frontend startup kit for building agent skill UIs and shippable products on a minimal, precise baseline. It gives a coding agent (Cursor, Claude Code, Codex, or similar) a single source of truth for typography, color, Tailwind configuration, shadcn/ui conventions, and the production surfaces a real product needs.
+A cross-agent startup kit that lets a coding agent (Cursor, Claude Code, Codex, or similar) build a complete, good-looking product for you — with a locked design system, a guided interview, and one-command scaffolds. You describe what you want; the agent asks a few questions, then builds it.
 
 The philosophy is restraint: make the smallest useful product that works, then polish until nothing feels accidental. Quiet, dense, tool-like UI by default; expressive treatments stay opt-in and confined to marketing surfaces.
+
+> **The one rule that defines this kit: onboard before building.** When someone says "build me X," the agent first runs a short interview (or loads answers already saved in the repo), writes them to `.startup-kit/intake.md`, and only then scaffolds. It never guesses your whole product from silence.
+
+## How it works
+
+1. You point an AI agent at this repo and tell it what you want to build.
+2. The agent reads `SKILL.md`, then runs onboarding (`references/onboarding.md`): it checks for saved answers, and if there are none, it interviews you in plain English (what it is, who it's for, how it should look, login, payments, and so on).
+3. It writes your answers to `.startup-kit/intake.md` and reads them back for you to confirm.
+4. It scaffolds the app on the kit's theme, builds your main screen, and wires everything together.
+5. It runs a pre-flight quality check before calling it done.
+
+This README has two kinds of reader. Jump to the one that's you:
+
+- **A person who wants to build something** → ["For people: no coding needed"](#for-people-no-coding-needed)
+- **An AI agent asked to use the kit** → ["For AI agents: start here"](#for-ai-agents-start-here)
+- **A developer who wants the commands** → ["Quick start (for developers)"](#quick-start-for-developers)
 
 ## What you get
 
@@ -16,7 +32,7 @@ The philosophy is restraint: make the smallest useful product that works, then p
 - Focused reference docs covering forms, states, accessibility, layout, copy, auth, payments, SEO, analytics, backend, and deployment.
 - One-command scaffolds (single app or monorepo) and a mechanical pre-flight quality gate.
 
-## No coding experience? Start here
+## For people: no coding needed
 
 You do not need to know how to code, what a "framework" is, or any of the words in this README. The kit is built so an AI agent does the work and walks you through it in plain English.
 
@@ -58,6 +74,21 @@ Paste one of these to your AI agent to get going. Edit the parts in `[brackets]`
 
 > Apply the startup kit's design system to this app — the clean default theme, light and dark mode, and real empty/loading/error states. Then run the pre-flight check.
 
+## For AI agents: start here
+
+If you are an AI agent asked to build, scaffold, or "use the startup kit," follow this exactly. The full spec is in `SKILL.md` and `AGENTS.md`; this is the short version.
+
+**Golden rule: never scaffold or write product code until a confirmed `.startup-kit/intake.md` exists.** A "build me X" request means *start the interview*, not *start building*. Building before onboarding is a failure of this skill.
+
+1. **Read `SKILL.md`** — the entry point; it links each reference to read before touching that area.
+2. **Look for saved answers** — run `scripts/scan-project.sh`, then check `.startup-kit/intake.md`, `AGENTS.md`, `CLAUDE.md`, `.cursorrules`, `.cursor/rules/*`, and any project brief. If a confirmed intake already exists, load it and skip to step 5.
+3. **Interview the user** — follow `references/onboarding.md`. Ask in plain English, in small batches, with a recommended default for each choice. Only ask what the saved answers don't already cover.
+4. **Write and confirm the intake** — copy `assets/templates/intake.md` to `.startup-kit/intake.md`, fill it, read it back to the user, and flip the line-1 marker to `status=confirmed` once they approve. Never set `confirmed` by hand to skip the interview.
+5. **Build** — scaffold with `scripts/create-app.sh <name>` (single app — the default) or `scripts/create-monorepo.sh <name>` (advanced, always-on backends). These scripts refuse to run until `scripts/check-intake.sh` passes, so you cannot accidentally skip onboarding.
+6. **Finish** — run `references/preflight.md` before declaring the work done.
+
+Each `SKILL.md` section names the reference to read before working on that area (theming, forms, states, auth, payments, and so on), so you pull only the context you need. The token files in `assets/theme/` and `assets/tailwind/` are a machine-readable design spec you can consume directly.
+
 ## Quick start (for developers)
 
 **Onboarding runs first — it is not optional.** For a new repo it interviews you through every decision a product needs (product, scope, style, theme, background animations, architecture, data, auth, payments, integrations, launch surfaces, deployment), writes a `.startup-kit/intake.md` source of truth, and only then scaffolds and wires the build. For existing code it detects first and only asks what it can't infer; if the answers are already stored (`.startup-kit/intake.md`, `AGENTS.md`, project rules), it loads them instead of re-asking. Point your agent at `references/onboarding.md`, or run the scan directly:
@@ -86,12 +117,6 @@ scripts/install-deploy-clis.sh           # vercel, supabase, koyeb CLIs
 ```
 
 This scaffolds a pnpm + Turborepo workspace: `apps/web` (Next.js on the kit theme) deploys to **Vercel**, `apps/api` (layered Express/TypeScript) deploys to **Koyeb** for always-on work, and **Supabase** provides managed Postgres, auth, and storage. The request/response contract and `zod` schemas live in `packages/shared` so both sides stay in sync. See `references/monorepo.md` for wiring, env vars, CORS, and the platform CLI commands.
-
-## Using it as an agent skill
-
-The repo is structured as a skill: `SKILL.md` is the entry point and the `references/` files are loaded on demand. Point your agent at this repo, then prompt it to build with the kit. Each `SKILL.md` section names the reference an agent should read before touching that area (forms, states, theming, and so on), so the agent pulls only the context it needs.
-
-The token files double as a machine-readable design spec, which is the format coding agents now consume directly.
 
 ## Design system at a glance
 
