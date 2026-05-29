@@ -3,6 +3,19 @@
 All notable changes to the startup kit are recorded here. This project follows
 [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Cross-agent install and updates
+
+- `scripts/setup.sh` installs the skill into every detected AI coding agent
+  (Cursor, Claude Code, Codex, OpenCode, Factory) by symlinking one clone into
+  each agent's skills directory. Supports `--host`, `--all`, `--copy`, `--list`,
+  and backs up any existing install before linking.
+- `scripts/upgrade.sh` fast-forwards the clone to the latest version and refreshes
+  every agent at once; `--check` reports whether an update is available without
+  applying it.
+- `scripts/lib/hosts.sh` is the single table of known agents and their skills dirs.
+
 ## v0.1.0 — 2026-05-29
 
 First public release. A cross-agent startup kit that interviews the user, then

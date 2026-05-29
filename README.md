@@ -20,6 +20,35 @@ This README has two kinds of reader. Jump to the one that's you:
 - **An AI agent asked to use the kit** → ["For AI agents: start here"](#for-ai-agents-start-here)
 - **A developer who wants the commands** → ["Quick start (for developers)"](#quick-start-for-developers)
 
+## Install across all your agents (and keep them updated)
+
+The kit is one git repo. Clone it once, and `setup.sh` symlinks it into every AI coding agent you have — Cursor, Claude Code, Codex, and more — so all of them get the skill. Because they share one clone, a single `upgrade.sh` updates every agent at once.
+
+```bash
+git clone https://github.com/duolahypercho/startup-kit.git ~/.startup-kit
+~/.startup-kit/scripts/setup.sh          # detects your agents, links the skill into each
+```
+
+- Preview what it will target: `~/.startup-kit/scripts/setup.sh --list`
+- Install into one agent only: `~/.startup-kit/scripts/setup.sh --host cursor`
+- Install into every known agent dir: `~/.startup-kit/scripts/setup.sh --all`
+- Windows / no symlink support: add `--copy`
+
+Then reload each agent (e.g. Cursor: Reload Window) and the skill is available.
+
+### Updating
+
+```bash
+~/.startup-kit/scripts/upgrade.sh          # pull the latest, refresh every agent
+~/.startup-kit/scripts/upgrade.sh --check  # only report whether a newer version exists
+```
+
+One pull updates all agents at once. Note: no AI agent auto-updates skills natively today, so this is how the kit stays current across them. (A per-agent "a new version is available — update now?" hook is on the roadmap.)
+
+### Or just paste this to your agent
+
+> Install the startup kit: run `git clone https://github.com/duolahypercho/startup-kit.git ~/.startup-kit && ~/.startup-kit/scripts/setup.sh`, then tell me which agents it installed into. To update later, run `~/.startup-kit/scripts/upgrade.sh`.
+
 ## What you get
 
 - A locked design system: SF Pro stack, a `13px` base, a fixed type scale (`12 / 13 / 14 / 16 / 18 / 24px`), and intent-based neutral colors.
@@ -186,6 +215,8 @@ scripts/                     create-app and asset/font/skill download helpers
 
 ## Scripts
 
+- `scripts/setup.sh [--host <agent>] [--all] [--copy] [--list]`: install the skill into every detected AI agent (Cursor, Claude Code, Codex, …) by symlinking this one clone into each agent's skills dir.
+- `scripts/upgrade.sh [--check]`: pull the latest version and refresh every agent at once (one update for all of them).
 - `scripts/scan-project.sh [dir]`: read-only inventory of an existing project (framework, package manager, monorepo, database, env) used by onboarding.
 - `scripts/check-intake.sh [path]`: validate that `.startup-kit/intake.md` exists, is confirmed, and has its required fields filled. The scaffold scripts run this as their onboarding gate; you can run it on its own to check readiness.
 - `scripts/create-app.sh <name>`: scaffold a themed Next.js app (refuses to run until onboarding's intake is confirmed; `--skip-onboarding` to override).
