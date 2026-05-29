@@ -47,7 +47,21 @@ skill works, you can delete those backups: `rm -rf ~/.cursor/skills/startup-kit.
 ~/.startup-kit/scripts/upgrade.sh --check  # only report whether a newer version exists
 ```
 
-One pull updates all agents at once. Note: no AI agent auto-updates skills natively today, so this is how the kit stays current across them. (A per-agent "a new version is available — update now?" hook is on the roadmap.)
+One pull updates all agents at once.
+
+### Get notified automatically (optional)
+
+No AI agent auto-updates skills natively, so by default you run `upgrade.sh` when you want it. To make agents tell you when a new version exists, install the session-start update hook:
+
+```bash
+~/.startup-kit/scripts/install-hooks.sh          # into every detected agent
+~/.startup-kit/scripts/install-hooks.sh --list   # see which agents support it
+~/.startup-kit/scripts/install-hooks.sh --uninstall
+```
+
+At the start of a session each agent runs a throttled check (at most once every few hours, never blocking) and, when you're behind, the agent proactively offers to run `upgrade.sh`. Supported today: **Cursor**, **Claude Code**, and **Codex**. Your existing hook config is preserved and backed up before any change; Node.js is required for the safe JSON edit. For Codex, run `/hooks` in the CLI once to review and trust the hook.
+
+You can also turn this on while installing: `~/.startup-kit/scripts/setup.sh --hooks`.
 
 ### Or just paste this to your agent
 
@@ -221,6 +235,8 @@ scripts/                     create-app and asset/font/skill download helpers
 
 - `scripts/setup.sh [--host <agent>] [--all] [--copy] [--list]`: install the skill into every detected AI agent (Cursor, Claude Code, Codex, …) by symlinking this one clone into each agent's skills dir.
 - `scripts/upgrade.sh [--check]`: pull the latest version and refresh every agent at once (one update for all of them).
+- `scripts/install-hooks.sh [--host <agent>] [--uninstall] [--list]`: wire a throttled "update available" check into each agent's session-start hook (Cursor, Claude Code, Codex).
+- `scripts/check-update.sh [--hook <agent>] [--force]`: the throttled checker the hooks call; prints an update notice (or nothing) and never blocks a session.
 - `scripts/scan-project.sh [dir]`: read-only inventory of an existing project (framework, package manager, monorepo, database, env) used by onboarding.
 - `scripts/check-intake.sh [path]`: validate that `.startup-kit/intake.md` exists, is confirmed, and has its required fields filled. The scaffold scripts run this as their onboarding gate; you can run it on its own to check readiness.
 - `scripts/create-app.sh <name>`: scaffold a themed Next.js app (refuses to run until onboarding's intake is confirmed; `--skip-onboarding` to override).

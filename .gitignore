@@ -21,3 +21,6 @@ yarn-debug.log*
 
 # Local intake artifact (kept per-project, not in the kit itself)
 .startup-kit/
+
+# Update-check throttle stamp written by scripts/check-update.sh
+.update-check.stamp

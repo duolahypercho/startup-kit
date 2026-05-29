@@ -26,6 +26,7 @@ usage() {
 USE_COPY=0
 DO_ALL=0
 DO_LIST=0
+DO_HOOKS=0
 REQ_HOSTS=()
 
 while [ $# -gt 0 ]; do
@@ -34,6 +35,7 @@ while [ $# -gt 0 ]; do
     --host=*) REQ_HOSTS+=("${1#*=}") ;;
     --all) DO_ALL=1 ;;
     --copy) USE_COPY=1 ;;
+    --hooks) DO_HOOKS=1 ;;
     --list) DO_LIST=1 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown option: $1" >&2; usage; exit 1 ;;
@@ -126,3 +128,12 @@ echo ""
 echo "Done. Update anytime (refreshes every agent at once):"
 echo "  $KIT_DIR/scripts/upgrade.sh"
 echo "Reload each agent (e.g. Cursor: Reload Window) to pick up the skill."
+
+if [ "$DO_HOOKS" = "1" ]; then
+  echo ""
+  "$KIT_DIR/scripts/install-hooks.sh"
+else
+  echo ""
+  echo "Tip: enable \"update available\" notifications in each agent with:"
+  echo "  $KIT_DIR/scripts/install-hooks.sh"
+fi

@@ -16,6 +16,17 @@ All notable changes to the startup kit are recorded here. This project follows
   applying it.
 - `scripts/lib/hosts.sh` is the single table of known agents and their skills dirs.
 
+### Optional "update available" notifications
+
+- `scripts/install-hooks.sh` wires a session-start update check into each agent's
+  hook system (Cursor `hooks.json`, Claude Code `settings.json`, Codex
+  `hooks.json`), so agents proactively offer to update. Idempotent, backs up
+  existing config, preserves unrelated hooks, and supports `--uninstall`,
+  `--host`, and `--list`. Also reachable via `setup.sh --hooks`.
+- `scripts/check-update.sh` is the throttled, fail-open checker the hooks call;
+  it emits Cursor/Claude/Codex-shaped output and never blocks a session.
+- `scripts/lib/merge-hook.js` performs the safe JSON edit (requires Node.js).
+
 ## v0.1.0 — 2026-05-29
 
 First public release. A cross-agent startup kit that interviews the user, then
