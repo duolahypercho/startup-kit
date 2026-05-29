@@ -65,25 +65,29 @@ echo "check-update.sh (formats, behind/current, fail-open)"
 if [ "$HAVE_GIT" = "0" ]; then
   echo "  -- skipped (git not installed)"
 else
+  # Build a "work" clone that is 2 commits behind its origin. Pin the default
+  # branch to main explicitly so the test is deterministic regardless of the
+  # host's init.defaultBranch (master vs main), which otherwise breaks on CI.
   make_behind_repo() {
     local root; root="$(sandbox)"
     (
       cd "$root" || exit 1
-      git init -q --bare origin.git
+      git init -q -b main --bare origin.git 2>/dev/null || { git init -q --bare origin.git; git -C origin.git symbolic-ref HEAD refs/heads/main; }
       git clone -q origin.git work 2>/dev/null
       mkdir -p work/scripts
       cp "$KIT_DIR/scripts/check-update.sh" work/scripts/
       cd work || exit 1
+      git checkout -q -B main
       git -c user.email=t@t -c user.name=t add -A
       git -c user.email=t@t -c user.name=t commit -qm v1
-      git push -q -u origin HEAD:main
-      git checkout -q -B main
+      git push -q origin main
       cd "$root" || exit 1
       git clone -q origin.git ahead 2>/dev/null
       cd ahead || exit 1
+      git checkout -q -B main origin/main
       git -c user.email=t@t -c user.name=t commit -q --allow-empty -m two
       git -c user.email=t@t -c user.name=t commit -q --allow-empty -m three
-      git push -q origin HEAD:main
+      git push -q origin main
     ) >/dev/null 2>&1
     echo "$root/work"
   }
