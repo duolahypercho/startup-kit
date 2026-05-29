@@ -43,10 +43,38 @@ last=0
 [ -f "$STAMP" ] && last="$(cat "$STAMP" 2>/dev/null || echo 0)"
 case "$last" in ''|*[!0-9]*) last=0 ;; esac
 
+# Non-interactive, hard-bounded fetch. A session-start hook must never hang the
+# agent, so we (a) forbid any credential/terminal prompt and (b) enforce a
+# wall-clock timeout, falling back to a background watchdog where `timeout` is
+# unavailable (e.g. stock macOS). Always returns 0.
+sk_fetch() {
+  local secs="${SK_FETCH_TIMEOUT:-8}"
+  export GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=true SSH_ASKPASS=true GCM_INTERACTIVE=never
+  set -- -c credential.helper= -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=5 fetch --quiet origin
+  if command -v timeout >/dev/null 2>&1; then
+    timeout "$secs" git "$@" >/dev/null 2>&1 || true
+  elif command -v gtimeout >/dev/null 2>&1; then
+    gtimeout "$secs" git "$@" >/dev/null 2>&1 || true
+  else
+    # Portable fallback: poll the fetch and kill it if it overruns. No separate
+    # watcher job, so a successful fetch produces no job-control noise.
+    git "$@" >/dev/null 2>&1 &
+    local pid=$! waited=0
+    while kill -0 "$pid" 2>/dev/null; do
+      sleep 1
+      waited=$((waited + 1))
+      if [ "$waited" -ge "$secs" ]; then
+        kill -KILL "$pid" 2>/dev/null
+        break
+      fi
+    done
+    wait "$pid" 2>/dev/null || true
+  fi
+  return 0
+}
+
 if [ "$FORCE" = "1" ] || [ "$(( now - last ))" -ge "$THROTTLE" ]; then
-  # Bounded, quiet fetch: aborts if the network stalls so session start is never
-  # held up, and never fails the script.
-  git -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=5 fetch --quiet origin >/dev/null 2>&1 || true
+  sk_fetch
   echo "$now" > "$STAMP" 2>/dev/null || true
 fi
 
