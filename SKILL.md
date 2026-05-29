@@ -70,6 +70,12 @@ Read `references/theming.md` before adding dark mode or changing color tokens.
 
 The kit ships both schemes in one token contract. `assets/tailwind/globals.css` includes `:root` (light) and `.dark` blocks; `assets/theme/dark-theme.tokens.json` and `assets/theme/dark-theme.css` mirror the light tokens. Use class-based dark mode with `next-themes`, default to `system`, and switch token values, never token names.
 
+## Theme Presets
+
+The default SF Pro theme is the baseline. Read `references/themes.md` before applying a brand identity.
+
+Opt-in presets modeled on well-known product design systems live in `assets/theme/presets/`: `linear.tokens.json` (dark-first, indigo accent, surface ladder), `vercel.tokens.json` (stark monochrome, ink-as-brand, pill CTAs), and `notion.tokens.json` (warm, pastel tints, purple CTA). Each follows the same token contract as the default and ships with an openly licensed font. Use one preset per project, or stay on the default for quiet tool UI.
+
 ## Layout And Spacing
 
 Read `references/layout.md` before structuring pages, app shells, or grids.

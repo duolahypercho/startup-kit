@@ -1,0 +1,54 @@
+{
+  "name": "Linear",
+  "summary": "Disciplined dark-first product UI. Hierarchy from surface lift and hairline borders, one indigo accent, near-monochrome.",
+  "colorScheme": "dark",
+  "source": "Observed from linear.app; values are public-site approximations, not official brand assets.",
+  "font": {
+    "sans": "\"Inter\", \"Inter Variable\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+    "mono": "\"Berkeley Mono\", ui-monospace, \"SF Mono\", Menlo, monospace",
+    "displayWeight": 510,
+    "displayTracking": "-0.022em",
+    "license": "Inter is open source (SIL OFL). Free to bundle."
+  },
+  "color": {
+    "surface": {
+      "0": "#08090A",
+      "1": "#0F1011",
+      "2": "#141516",
+      "3": "#1C1C1F",
+      "4": "#232326"
+    },
+    "text": {
+      "strong": "#F7F8F8",
+      "default": "#D0D6E0",
+      "subtle": "#8A8F98",
+      "faint": "#62666D"
+    },
+    "accent": {
+      "default": "#5E6AD2",
+      "hover": "#828FFF"
+    },
+    "border": {
+      "subtle": "rgba(255,255,255,0.05)",
+      "default": "rgba(255,255,255,0.08)",
+      "strong": "#34343A"
+    },
+    "status": {
+      "success": "#4CB782",
+      "warning": "#F2C94C",
+      "error": "#EB5757"
+    }
+  },
+  "radius": {
+    "sm": "4px",
+    "base": "8px",
+    "lg": "12px",
+    "pill": "9999px"
+  },
+  "rules": [
+    "Use the surface ladder for elevation. Do not use drop shadows for hierarchy.",
+    "Use the indigo accent only for the brand mark, focus rings, and one primary CTA per section.",
+    "Keep borders as hairlines. No heavy dividers.",
+    "Communicate hierarchy with weight and size, not decorative color."
+  ]
+}

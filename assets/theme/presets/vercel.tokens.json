@@ -1,0 +1,59 @@
+{
+  "name": "Vercel",
+  "summary": "Stark monochrome developer-platform look. Ink is the brand; no chromatic accent. Pill CTAs, deep gray scale, subtle stacked shadows.",
+  "colorScheme": "light",
+  "source": "Observed from vercel.com; values are public-site approximations, not official brand assets.",
+  "font": {
+    "sans": "\"Geist\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+    "mono": "\"Geist Mono\", ui-monospace, \"SF Mono\", Menlo, monospace",
+    "displayTracking": "-0.024em",
+    "maxWeight": 600,
+    "license": "Geist and Geist Mono are open source (SIL OFL) by Vercel. Free to bundle."
+  },
+  "color": {
+    "surface": {
+      "0": "#FFFFFF",
+      "1": "#FAFAFA",
+      "2": "#F2F2F2",
+      "3": "#EBEBEB"
+    },
+    "text": {
+      "strong": "#171717",
+      "default": "#404040",
+      "subtle": "#666666",
+      "faint": "#8F8F8F"
+    },
+    "accent": {
+      "default": "#171717",
+      "hover": "#000000",
+      "note": "There is no chromatic accent. Ink (#171717) is the accent, polarity-flipped onto dark bands."
+    },
+    "band": {
+      "background": "#000000",
+      "text": "#FFFFFF"
+    },
+    "border": {
+      "subtle": "#EBEBEB",
+      "default": "#E5E5E5",
+      "strong": "#D4D4D4"
+    },
+    "status": {
+      "success": "#0070F3",
+      "warning": "#F5A623",
+      "error": "#E5484D"
+    }
+  },
+  "radius": {
+    "sm": "6px",
+    "base": "8px",
+    "lg": "12px",
+    "pill": "100px"
+  },
+  "rules": [
+    "Use no second accent color. Use ink and polarity-flipped dark bands for emphasis.",
+    "Use 100px pill radius on primary marketing CTAs.",
+    "Use sentence-case headlines with tight negative tracking.",
+    "Use stacked subtle shadows, never heavy drop shadows.",
+    "Do not use a display weight above 600."
+  ]
+}
