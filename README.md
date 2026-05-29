@@ -11,13 +11,20 @@ The philosophy is restraint: make the smallest useful product that works, then p
 - Three opt-in brand presets modeled on Linear, Vercel, and Notion.
 - Tailwind v3 and v4 configs plus shadcn/ui setup with `cssVariables` enabled.
 - Bundled icon starter sets (Lucide, Simple Icons, Tabler) and 42 React Bits background components.
+- A detect-first onboarding flow that inspects existing code, captures a `.startup-kit/intake.md` source of truth, and routes greenfield or existing projects to the right path.
 - A layered Node/TypeScript/Express backend reference, plus a monorepo pattern for keeping the frontend and backend in one repo while hosting them on different platforms (Vercel + Supabase + Koyeb).
 - Focused reference docs covering forms, states, accessibility, layout, copy, auth, payments, SEO, analytics, backend, and deployment.
 - One-command scaffolds (single app or monorepo) and a mechanical pre-flight quality gate.
 
 ## Quick start
 
-Scaffold a new app already wired to the theme:
+Start with onboarding — it inspects any existing code, asks only what it can't infer (style + architecture), writes a `.startup-kit/intake.md` source of truth, and routes you to the right path. Point your agent at `references/onboarding.md`, or run the scan directly:
+
+```bash
+scripts/scan-project.sh        # read-only inventory of the current project
+```
+
+For a greenfield app, scaffold one already wired to the theme:
 
 ```bash
 scripts/create-app.sh my-app
@@ -85,6 +92,7 @@ scripts/                     create-app and asset/font/skill download helpers
 
 | File | Covers |
 | --- | --- |
+| `onboarding.md` | Detect-first intake: scan, style, architecture, gap analysis |
 | `minimal-product.md` | The product doctrine: one user, one job, one workflow |
 | `tailwind-shadcn.md` | Tailwind token mapping and shadcn/ui setup |
 | `theming.md` | Light/dark tokens and class-based dark mode |
@@ -110,8 +118,12 @@ scripts/                     create-app and asset/font/skill download helpers
 
 ## Scripts
 
+- `scripts/scan-project.sh [dir]`: read-only inventory of an existing project (framework, package manager, monorepo, database, env) used by onboarding.
 - `scripts/create-app.sh <name>`: scaffold a themed Next.js app.
 - `scripts/create-monorepo.sh <name>`: scaffold a pnpm + Turborepo monorepo (`apps/web` + `apps/api` + `packages/shared`) for split hosting on Vercel, Supabase, and Koyeb.
+- `scripts/add-backend.sh [frontend-dir]`: add a layered Express/TS backend to an existing frontend, restructuring into a workspace.
+- `scripts/add-frontend.sh [backend-dir]`: add a themed Next.js frontend to an existing backend, restructuring into a workspace.
+- `scripts/adopt-monorepo.sh <frontend-dir> <backend-dir>`: restructure an existing frontend + backend into a monorepo in place (`git mv`, history preserved).
 - `scripts/install-deploy-clis.sh`: install the Vercel, Supabase, and Koyeb CLIs.
 - `scripts/download-sf-pro.sh`: download Apple's official SF Pro installer into `assets/fonts/vendor/`.
 - `scripts/download-lucide-icons.sh`, `download-simple-icons.sh`, `download-tabler-icons.sh`: refresh bundled icon sets.

@@ -11,6 +11,18 @@ The product goal is simple: make the smallest useful product that works, then po
 
 Before building, state the one user, the one job, and the one primary workflow in a sentence. If the requirements are unclear, fill `assets/templates/minimal-product-brief.md` first. Build for that job, then run `references/preflight.md` before calling the work done.
 
+## Onboarding
+
+Read `references/onboarding.md` and run it first on any new engagement, before scaffolding or editing.
+
+Onboarding is the entry point that routes a user to the one path that fits them. Detect first, then ask: run `scripts/scan-project.sh` to inventory any existing code, report what was found, and only ask what cannot be inferred (style and the few architecture choices). For existing frontends or backends, inspect the code and write down its file structure plus a concrete gap analysis against the kit's conventions — never modify source during onboarding. Capture everything in `.startup-kit/intake.md` (from `assets/templates/intake.md`); it is the source of truth every later session reads. Finish by choosing a single path and stating the next command:
+
+- Greenfield: `scripts/create-app.sh` (single app) or `scripts/create-monorepo.sh` (split hosting).
+- Existing frontend only: `scripts/add-backend.sh`.
+- Existing backend only: `scripts/add-frontend.sh`.
+- Existing frontend + backend in one repo: `scripts/adopt-monorepo.sh` (restructures in place with `git mv`, preserving history).
+- Two repos or "leave it as-is": wire-only via env + CORS (`references/monorepo.md`). The monorepo is a convenience, not a prerequisite.
+
 ## Scope
 
 Use this kit for tool UI, skill interfaces, dashboards, and shippable products that should feel quiet, precise, and dense.
