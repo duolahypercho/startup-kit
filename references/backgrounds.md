@@ -21,6 +21,40 @@ Avoid an animated background for:
 - Any surface where text must stay highly legible.
 - Long-running views that keep the GPU busy without purpose.
 
+## In Scaffolded Apps
+
+`scripts/create-app.sh` and `scripts/create-monorepo.sh` bundle the full catalog
+into `src/components/backgrounds/` and pre-install `three` and `ogl`, so a
+background can be dropped onto any marketing/hero/auth surface without setup.
+
+Default behavior: wire one expressive background into the landing/hero (and
+optionally auth/splash) of every product, using the bundled
+`animated-background.tsx` wrapper. It lazy-loads the component, renders a static
+gradient fallback under `prefers-reduced-motion`, and layers a scrim for
+legibility. Keep dense tool UI (dashboards, tables, forms) quiet and flat — the
+exclusions below still apply.
+
+```tsx
+import { AnimatedBackground } from "@/components/backgrounds/animated-background";
+
+<section className="relative isolate overflow-hidden">
+  <AnimatedBackground
+    load={() => import("@/components/backgrounds/LiquidEther")}
+    componentProps={{ colors: ["#5227FF", "#FF9FFC", "#B497CF"] }}
+  />
+  <div className="relative z-10">{/* hero content */}</div>
+</section>
+```
+
+`three` + `ogl` cover most components. For one that needs extra packages
+(postprocessing, `@react-three/fiber`, `gsap`, `face-api.js`), install its deps
+and copy its source in one step:
+
+```bash
+scripts/add-background.sh <Name> [target-app-dir]   # e.g. Hyperspeed, Dither, DotGrid
+scripts/add-background.sh all                        # every component + all deps
+```
+
 ## Bundled Backgrounds
 
 Use `assets/components/backgrounds/manifest.json` to see the approved set.
