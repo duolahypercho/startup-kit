@@ -30,6 +30,34 @@ You do not need to know how to code, what a "framework" is, or any of the words 
 
 That's it. The agent figures out the rest, builds the app, and gets it ready to go live.
 
+## Prompts to copy
+
+Paste one of these to your AI agent to get going. Edit the parts in `[brackets]`. You don't need to be precise — the agent will ask follow-up questions.
+
+**Start from scratch (don't know where to begin):**
+
+> Use the startup kit. I want to build [a simple app to track my freelance invoices]. I'm not technical — ask me questions one at a time, explain anything confusing, and pick sensible defaults when I'm unsure. Walk me all the way to a running app.
+
+**You already know what you want:**
+
+> Use the startup kit to build [an app where coaches can post weekly workout plans and clients check them off]. People log in, each client only sees their own plans, no payments yet. Run onboarding, write the intake, then build it.
+
+**Just explore my idea first (no building yet):**
+
+> Use the startup kit's onboarding to interview me about [my product idea] and write the `.startup-kit/intake.md` plan. Don't build anything yet — I want to review the plan first.
+
+**Add the kit to a project I already have:**
+
+> Use the startup kit on this existing project. Scan it first, tell me what you found, point out where it doesn't match the kit's conventions, and propose a plan before changing anything.
+
+**Get it online:**
+
+> Walk me through putting my app live, step by step. Tell me exactly which accounts to create and what to click — assume I've never deployed anything.
+
+**Just make it look good:**
+
+> Apply the startup kit's design system to this app — the clean default theme, light and dark mode, and real empty/loading/error states. Then run the pre-flight check.
+
 ## Quick start (for developers)
 
 Start with onboarding. For a new repo it interviews you through every decision a product needs (product, scope, style, architecture, data, auth, payments, integrations, launch surfaces, deployment), writes a `.startup-kit/intake.md` source of truth, and then scaffolds and wires the build. For existing code it detects first and only asks what it can't infer. Point your agent at `references/onboarding.md`, or run the scan directly:
