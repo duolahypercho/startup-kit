@@ -60,13 +60,13 @@ Paste one of these to your AI agent to get going. Edit the parts in `[brackets]`
 
 ## Quick start (for developers)
 
-Start with onboarding. For a new repo it interviews you through every decision a product needs (product, scope, style, architecture, data, auth, payments, integrations, launch surfaces, deployment), writes a `.startup-kit/intake.md` source of truth, and then scaffolds and wires the build. For existing code it detects first and only asks what it can't infer. Point your agent at `references/onboarding.md`, or run the scan directly:
+**Onboarding runs first — it is not optional.** For a new repo it interviews you through every decision a product needs (product, scope, style, theme, background animations, architecture, data, auth, payments, integrations, launch surfaces, deployment), writes a `.startup-kit/intake.md` source of truth, and only then scaffolds and wires the build. For existing code it detects first and only asks what it can't infer; if the answers are already stored (`.startup-kit/intake.md`, `AGENTS.md`, project rules), it loads them instead of re-asking. Point your agent at `references/onboarding.md`, or run the scan directly:
 
 ```bash
 scripts/scan-project.sh        # read-only inventory of the current project
 ```
 
-For a greenfield app, scaffold one already wired to the theme:
+The scaffold scripts enforce this: `create-app.sh` and `create-monorepo.sh` **refuse to run until `.startup-kit/intake.md` exists**, so an agent can't skip the interview by jumping to the build. Once onboarding has written the intake:
 
 ```bash
 scripts/create-app.sh my-app
@@ -74,7 +74,7 @@ cd my-app
 npm run dev
 ```
 
-This creates a Next.js App Router + TypeScript + Tailwind + shadcn/ui project with the light and dark token blocks, the common primitives, and the SF Pro stack. See `references/scaffold.md` for other stacks (Vite, Remix, Astro, Vue, Svelte): copy the token blocks from `assets/tailwind/globals.css` and keep the same token names.
+This creates a Next.js App Router + TypeScript + Tailwind + shadcn/ui project with the light and dark token blocks, the common primitives, and the SF Pro stack. If you are an experienced developer who deliberately wants raw scaffolding without onboarding, override with `scripts/create-app.sh my-app --skip-onboarding` (or `STARTUP_KIT_SKIP_ONBOARDING=1`). See `references/scaffold.md` for other stacks (Vite, Remix, Astro, Vue, Svelte): copy the token blocks from `assets/tailwind/globals.css` and keep the same token names.
 
 ## Monorepo and split hosting
 
@@ -162,7 +162,8 @@ scripts/                     create-app and asset/font/skill download helpers
 ## Scripts
 
 - `scripts/scan-project.sh [dir]`: read-only inventory of an existing project (framework, package manager, monorepo, database, env) used by onboarding.
-- `scripts/create-app.sh <name>`: scaffold a themed Next.js app.
+- `scripts/check-intake.sh [path]`: validate that `.startup-kit/intake.md` exists, is confirmed, and has its required fields filled. The scaffold scripts run this as their onboarding gate; you can run it on its own to check readiness.
+- `scripts/create-app.sh <name>`: scaffold a themed Next.js app (refuses to run until onboarding's intake is confirmed; `--skip-onboarding` to override).
 - `scripts/create-monorepo.sh <name>`: scaffold a pnpm + Turborepo monorepo (`apps/web` + `apps/api` + `packages/shared`) for split hosting on Vercel, Supabase, and Koyeb.
 - `scripts/add-backend.sh [frontend-dir]`: add a layered Express/TS backend to an existing frontend, restructuring into a workspace.
 - `scripts/add-frontend.sh [backend-dir]`: add a themed Next.js frontend to an existing backend, restructuring into a workspace.
@@ -171,12 +172,27 @@ scripts/                     create-app and asset/font/skill download helpers
 - `scripts/download-sf-pro.sh`: download Apple's official SF Pro installer into `assets/fonts/vendor/`.
 - `scripts/download-lucide-icons.sh`, `download-simple-icons.sh`, `download-tabler-icons.sh`: refresh bundled icon sets.
 - `scripts/install-gsap-skills.sh`: install the official GreenSock GSAP skills when not already present.
+- `scripts/test/onboarding.test.sh`: tests for the onboarding gate and intake validator (run by CI in `.github/workflows/ci.yml`, along with `bash -n` and shellcheck).
 
 ## Fonts and licensing
 
 SF Pro is Apple's system font. It is free to download but not freely redistributable, so it is intentionally not committed: `scripts/download-sf-pro.sh` fetches it into `assets/fonts/vendor/`, which is gitignored. Do not commit the extracted `.otf` files or the installer unless your project has confirmed license rights. On Apple devices the bundled font stack falls back to the native system font, so UI looks correct even without installing anything.
 
 Bundled assets carry their own licenses: Lucide (ISC), Simple Icons and Tabler (each in their respective `LICENSE` files), and the background components originate from React Bits. Check brand usage terms before shipping Simple Icons logos.
+
+## License
+
+The startup-kit's own source (SKILL.md, references, scripts, templates, configuration) is MIT licensed — see `LICENSE`. Bundled third-party assets keep their original licenses, included alongside them.
+
+## Pinned tool versions
+
+The scaffold scripts pin `create-next-app` and `shadcn` to known-good majors (`scripts/lib/versions.sh`) so a fresh clone builds the toolchain the kit was validated against, instead of whatever `@latest` happens to be that day. To test a newer major without editing scripts, override per run:
+
+```bash
+SK_NEXT_MAJOR=17 scripts/create-app.sh my-app
+```
+
+When bumping a default in `scripts/lib/versions.sh`, re-validate the scaffold and run the pre-flight check before committing.
 
 ## Status
 

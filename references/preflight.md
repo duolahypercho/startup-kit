@@ -4,6 +4,11 @@ Run this before declaring any UI done. Each item is binary. If one cannot be hon
 
 This is the startup-kit quality gate. It enforces the rules in the other references mechanically, not by feeling.
 
+## Onboarding
+
+- [ ] A confirmed `.startup-kit/intake.md` exists and `scripts/check-intake.sh` passes (the product was interviewed or its stored answers were loaded — not assumed).
+- [ ] What was built matches the intake's product, scope, style, and architecture. If the build drifted from the intake, update the intake and re-confirm, or fix the build.
+
 ## Brief
 
 - [ ] The one user, one job, and one primary workflow are stated (`references/minimal-product.md`).

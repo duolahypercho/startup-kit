@@ -1,4 +1,4 @@
 interface:
   display_name: "Startup Kit"
   short_description: "Minimal product + UI kit for agent skills and shippable apps"
-  default_prompt: "Use $startup-kit to scaffold and build a minimal product with the default SF Pro theme, light/dark tokens, Tailwind settings, shadcn/ui components, Lucide icons, restrained GSAP animation, and the bundled references for forms, states, accessibility, layout, copy, auth, payments, SEO, and analytics."
+  default_prompt: "Use $startup-kit. First run onboarding (references/onboarding.md): check the repo for stored answers (.startup-kit/intake.md, AGENTS.md, rules), and if none exist, interview me with the grouped questions (product, scope, style, theme, background animations, architecture, data, auth, payments, launch, deploy) before building anything. Do not scaffold until .startup-kit/intake.md is written and confirmed. Only then scaffold and build the minimal product with the default SF Pro theme, light/dark tokens, Tailwind settings, shadcn/ui components, Lucide icons, restrained GSAP animation, and the bundled references for forms, states, accessibility, layout, copy, auth, payments, SEO, and analytics."

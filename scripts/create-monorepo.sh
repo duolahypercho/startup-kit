@@ -11,10 +11,20 @@ set -euo pipefail
 #
 # Usage: scripts/create-monorepo.sh <product-name>
 
-PRODUCT_NAME="${1:-startup-product}"
 KIT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=/dev/null
 . "$KIT_DIR/scripts/lib/workspace.sh"
+# shellcheck source=/dev/null
+. "$KIT_DIR/scripts/lib/onboarding-gate.sh"
+# shellcheck source=/dev/null
+. "$KIT_DIR/scripts/lib/versions.sh"
+
+# Refuse to scaffold until onboarding has produced .startup-kit/intake.md
+# (override with --skip-onboarding or STARTUP_KIT_SKIP_ONBOARDING=1).
+og_parse_and_require "$@" || exit 1
+set -- ${OG_ARGS[@]+"${OG_ARGS[@]}"}
+
+PRODUCT_NAME="${1:-startup-product}"
 
 if ! command -v pnpm >/dev/null 2>&1; then
   echo "pnpm is required. Enable it with: corepack enable pnpm   (or: npm i -g pnpm)"
@@ -126,7 +136,7 @@ ws_write_api
 # ---------------------------------------------------------------------------
 echo ""
 echo "Scaffolding apps/web (Next.js + Tailwind + shadcn/ui)..."
-npx --yes create-next-app@latest apps/web \
+npx --yes "create-next-app@${SK_NEXT_MAJOR}" apps/web \
   --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" \
   --no-turbopack --use-pnpm
 
@@ -136,13 +146,17 @@ ws_apply_web_theme_v3 "$KIT_DIR" "apps/web" "pnpm"
 # shadcn/ui primitives using the kit config.
 (
   cd apps/web
-  npx --yes shadcn@latest add --yes --overwrite \
+  npx --yes "shadcn@${SK_SHADCN_MAJOR}" add --yes --overwrite \
     button input label select textarea checkbox switch tabs \
     dialog dropdown-menu popover tooltip sheet table form card alert skeleton sonner
   npm pkg set name="web" >/dev/null
   npm pkg set dependencies.@repo/shared="workspace:*" >/dev/null
   npm pkg set scripts.typecheck="tsc --noEmit" >/dev/null
 )
+
+# Bundle the animated/3D background catalog + reusable wrapper into apps/web and
+# install the common WebGL runtimes (three + ogl).
+ws_add_backgrounds "$KIT_DIR" "apps/web" "pnpm"
 
 # ---------------------------------------------------------------------------
 # Install everything through the workspace.

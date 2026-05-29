@@ -1,8 +1,12 @@
+<!-- startup-kit:intake status=draft -->
+
 # Project Intake
 
 The persistent source of truth for this product. Onboarding fills it; every later session reads it. Commit it to the repo (recommended path: `.startup-kit/intake.md`). Re-running onboarding updates this file and never overwrites source code.
 
 Mark any section that does not apply as `N/A`. Record env/secret **names only** — never paste secret values here.
+
+**Confirmation gate:** the scaffold scripts refuse to build until the marker on line 1 reads `status=confirmed`. Onboarding flips it to `confirmed` only after the user has reviewed and approved this intake. Do not set it by hand to skip the interview.
 
 ## 1. Product
 

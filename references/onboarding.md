@@ -2,6 +2,10 @@
 
 Run this first, before any building. Onboarding is the front door to the whole kit: it figures out where the user is starting, asks everything needed to build the right product, writes it all down, and then guides the build to a running app.
 
+**This is a hard gate (see the STOP rule in `SKILL.md`).** Never scaffold or write product code until onboarding has produced a confirmed `.startup-kit/intake.md`. A "build me X" request triggers the interview, not the build.
+
+**Always ask the questions unless the repo already answers them.** Before interviewing, check for stored answers — `.startup-kit/intake.md` first, then `AGENTS.md` / `CLAUDE.md` / `.cursorrules` / `.cursor/rules/*`, then any host-provided brief or memory. If a complete confirmed intake exists, load it and skip the questions. If answers are partial, pre-fill them and ask only what's missing. If nothing is stored, run the full interview below — do not silently assume defaults for the whole product.
+
 Onboarding has two jobs that depend on the starting state:
 
 - **Greenfield (new repo / empty directory):** there is nothing to detect, so **interview thoroughly**. Walk the user through every decision a real product needs — product, users, scope, style, architecture, data, auth, payments, integrations, deployment, and launch surfaces — then scaffold and wire it for them. This is the "guide me and build the whole thing" path.
@@ -12,15 +16,15 @@ Onboarding is read-only on source code. It inspects, asks, and plans; the only f
 ## The Flow
 
 ```
-0. Scan            read-only inventory of the working directory
-1. Branch          greenfield → full interview · existing → detect-first gap analysis
-2. Interview       ask the question bank below, grouped and confirmed
+0. Scan            read-only inventory + check for stored answers (intake, AGENTS.md, rules)
+1. Branch          stored intake → load & build · greenfield → full interview · existing → detect-first
+2. Interview       ask the question bank below, grouped and confirmed (skip what's stored)
 3. Intake          write .startup-kit/intake.md and read it back to the user
 4. Blueprint       state the ordered build plan and the first command
 5. Build           run the scaffold, then wire each surface, checking the plan off
 ```
 
-### Step 0 — Scan the working directory
+### Step 0 — Scan the working directory and check for stored answers
 
 Always run the inventory first, even on what looks like an empty folder:
 
@@ -30,12 +34,21 @@ scripts/scan-project.sh
 
 It reports git state, package manager, monorepo layout, every `package.json` with its detected role (frontend/backend) and frameworks, Python manifests, database/auth libraries, env files, and existing deploy config — all read-only. If it finds nothing, treat the project as greenfield.
 
+In the same pass, check for **stored answers** so you don't re-ask what's already written down, in this priority order:
+
+1. `.startup-kit/intake.md` — the kit's own source of truth. If present and confirmed, this answers everything; load it and go to Step 4/5.
+2. `AGENTS.md`, `CLAUDE.md`, `.cursorrules`, `.cursor/rules/*`, `README.md`, or a project brief — these may name the product, users, scope, or stack.
+3. Any host-provided memory or context the agent has access to.
+
+Map whatever you find onto the intake fields, then in Step 2 ask **only the questions that remain unanswered**. If nothing is stored, the full interview is mandatory.
+
 Then read the key files it surfaced (root `package.json`, app entry points, folder structure) so the plan is grounded in real code. Summarize what you found in one or two sentences before asking anything, e.g. *"This is an empty directory — I'll set the product up from scratch,"* or *"I found a Next.js frontend in `web/` and an Express + MongoDB API in `server/`, npm, not yet a workspace."*
 
 ### Step 1 — Branch on the starting state
 
+- **Confirmed `.startup-kit/intake.md` found → resume.** Load it, summarize what you read, and continue the build from its plan checklist. Re-ask only if the user wants to change something.
 - **Nothing found → greenfield.** Go to Step 2 and run the full interview.
-- **Code found → existing.** Skip the questions the scan already answered. Still run the interview for everything the code does *not* tell you (the product definition, the style direction, the launch surfaces, the deploy targets), then add the gap analysis in Step 3b.
+- **Code or stored notes found → existing.** Skip the questions the scan and stored answers (`AGENTS.md`, rules, README) already cover. Still run the interview for everything they do *not* tell you (the product definition, the style direction, the launch surfaces, the deploy targets), then add the gap analysis in Step 3b.
 
 ## Step 2 — The Interview
 
@@ -78,7 +91,7 @@ Walk these groups in order. Defaults are in **bold**. Phrase each as plain Engli
 
 9. "How should it look?" Offer plain choices: **clean and simple (recommended default)**, or "like Linear / Vercel / Notion" (presets), or "match my brand" (custom — then collect font, main color, and logo and map them onto the token contract; change token values, never names — `references/themes.md`, `references/theming.md`).
 10. "Light, dark, or **let it follow the user's device** (default)?"
-11. Only if it's a marketing/landing page: "Want a moving/animated background on the hero?" Tools and dashboards get **none** (`references/backgrounds.md`) — don't ask there.
+11. Only if it's a marketing/landing page: "The hero gets a moving/animated background by default — any preference (calm, bold, none)?" Default to wiring one in; tools and dashboards get **none** (`references/backgrounds.md`) — don't ask there.
 
 ### Group D — Architecture (always — present as a real choice, in plain outcomes)
 
@@ -146,6 +159,8 @@ After the last applicable group, **read the choices back as a short plain-Englis
 
 Copy `assets/templates/intake.md` to `.startup-kit/intake.md` in the target repo and fill every section from the interview: product, scope, style, architecture, data model, auth, payments, integrations, launch surfaces, deployment, env/secrets (names only), plan, and out-of-scope. Leave a group's section marked `N/A` when it was skipped. Commit it. This single artifact is the source of truth; re-running onboarding updates it in place and never touches source code.
 
+The intake's line-1 marker starts as `<!-- startup-kit:intake status=draft -->`. After you read the intake back and the user approves it, flip it to `status=confirmed`. The scaffold scripts run `scripts/check-intake.sh`, which refuses to build until the marker reads `confirmed` and the always-required product fields are filled — so confirming the intake is what unlocks the build. Never set `confirmed` by hand to skip the interview.
+
 ### Step 3b — For existing code, add the map and gap analysis
 
 For any existing frontend or backend, also produce a written map (not changes):
@@ -169,9 +184,10 @@ Turn the intake into an ordered, concrete plan in the intake's "Plan" section. E
 6. Build the **primary workflow** screen first — the one job, end to end, with real empty/loading/error/success states (`references/minimal-product.md`, `references/states.md`).
 7. Add forms with `react-hook-form` + `zod` (`references/forms.md`).
 8. Add payments if Group G applies (`references/payments.md`).
-9. Add launch surfaces from Group I (`references/seo.md`, `references/analytics.md`, `references/legal.md`).
-10. Configure deploy + env from Group J (`references/monorepo.md` for split hosting).
-11. Run `references/preflight.md` before calling it done.
+9. If there's a landing/marketing/hero surface, wire one bundled animated/3D background into it with `AnimatedBackground` (`references/backgrounds.md`). The scaffold already bundled the catalog and installed `three` + `ogl`; don't ship a flat hero by default. Keep tool/dashboard screens flat.
+10. Add launch surfaces from Group I (`references/seo.md`, `references/analytics.md`, `references/legal.md`).
+11. Configure deploy + env from Group J (`references/monorepo.md` for split hosting).
+12. Run `references/preflight.md` before calling it done.
 
 State the plan and the exact first command, then proceed.
 

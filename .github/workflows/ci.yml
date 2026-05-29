@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  scripts:
+    name: Shell scripts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Syntax check all scripts
+        run: |
+          fail=0
+          while IFS= read -r -d '' f; do
+            bash -n "$f" || fail=1
+          done < <(find scripts -name '*.sh' -print0)
+          exit $fail
+
+      - name: Shellcheck
+        run: shellcheck --severity=warning scripts/*.sh scripts/lib/*.sh scripts/test/*.sh
+
+      - name: Onboarding gate tests
+        run: bash scripts/test/onboarding.test.sh

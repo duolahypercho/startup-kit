@@ -15,7 +15,8 @@ ws_require_clean_git() {
     echo "Working tree is not clean. Commit or stash your changes before restructuring."
     return 1
   fi
-  local backup="backup/pre-monorepo-$(date -u +%Y%m%d%H%M%S)"
+  local backup
+  backup="backup/pre-monorepo-$(date -u +%Y%m%d%H%M%S)"
   git branch "$backup"
   echo "Created backup branch '$backup' (restore with: git reset --hard $backup)."
 }
@@ -357,7 +358,7 @@ ws_apply_web_theme_v3() {
   cp "$kit/assets/shadcn/components.tailwind-v3.json" "$web/components.json"
 
   (
-    cd "$web"
+    cd "$web" || exit 1
     # Drop the v4 toolchain create-next-app installed, pin v3, and write configs.
     # tailwindcss-animate is required by the kit's tailwind.config.ts.
     if [ "$pm" = "pnpm" ]; then
@@ -386,6 +387,163 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 CN
+    fi
+  )
+}
+
+# Bundle the React Bits animated/3D background catalog into a web app and ship a
+# reusable wrapper so any background can be dropped in "wherever" with a lazy
+# import, a reduced-motion fallback, and a legibility scrim. The component source
+# files are cheap and tree-shaken (only imported ones reach the bundle), so we
+# copy the whole catalog and pre-install the two most common WebGL runtimes
+# (three + ogl) that cover the majority of the components. Heavier components
+# (postprocessing, react-three-fiber, gsap, face-api.js) declare their own deps
+# in manifest.json — install those on demand with scripts/add-background.sh.
+# $1 = kit dir, $2 = path to the web app, $3 = package manager (pnpm|npm)
+ws_add_backgrounds() {
+  local kit="$1" web="$2" pm="${3:-npm}"
+  local dest="$web/src/components/backgrounds"
+  mkdir -p "$dest"
+
+  # Catalog source (components fill their parent; most render on a transparent canvas).
+  cp "$kit"/assets/components/backgrounds/*.jsx "$dest"/ 2>/dev/null || true
+  cp "$kit"/assets/components/backgrounds/*.css "$dest"/ 2>/dev/null || true
+  cp "$kit"/assets/components/backgrounds/manifest.json "$dest"/ 2>/dev/null || true
+
+  # Reusable wrapper: lazy-loads the chosen background only when motion is allowed,
+  # renders a static fallback under prefers-reduced-motion, and layers a scrim so
+  # foreground copy stays legible. Keeps the heavy WebGL work in a client leaf.
+  cat > "$dest/animated-background.tsx" <<'EOF'
+"use client";
+
+import { useEffect, useRef, useState, type ComponentType } from "react";
+
+type BackgroundModule = { default: ComponentType<Record<string, unknown>> };
+
+type AnimatedBackgroundProps = {
+  /** Lazy import of a component in this folder, e.g. () => import("@/components/backgrounds/LiquidEther"). */
+  load: () => Promise<BackgroundModule>;
+  /** Props forwarded to the background component (colors, speed, etc.). */
+  componentProps?: Record<string, unknown>;
+  /** Extra classes for the absolutely-positioned wrapper. */
+  className?: string;
+  /** Static fallback shown when the user prefers reduced motion. */
+  fallbackClassName?: string;
+  /** Translucent scrim + bottom fade for foreground legibility. Default true. */
+  scrim?: boolean;
+};
+
+/**
+ * Drop an animated/3D background behind any section. The parent must be
+ * positioned (e.g. `relative isolate overflow-hidden`):
+ *
+ *   <section className="relative isolate overflow-hidden">
+ *     <AnimatedBackground load={() => import("@/components/backgrounds/LiquidEther")} />
+ *     <div className="relative z-10"> ...content... </div>
+ *   </section>
+ */
+export function AnimatedBackground({
+  load,
+  componentProps,
+  className = "",
+  fallbackClassName = "bg-[radial-gradient(120%_100%_at_50%_0%,hsl(var(--primary)/0.12),transparent_70%)]",
+  scrim = true,
+}: AnimatedBackgroundProps) {
+  const [Background, setBackground] = useState<ComponentType<Record<string, unknown>> | null>(null);
+  const [allowMotion, setAllowMotion] = useState(false);
+  const loadRef = useRef(load);
+  loadRef.current = load;
+
+  useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setAllowMotion(!query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
+    if (!allowMotion) {
+      setBackground(null);
+      return;
+    }
+    let active = true;
+    loadRef.current().then((mod) => {
+      if (active) setBackground(() => mod.default);
+    });
+    return () => {
+      active = false;
+    };
+  }, [allowMotion]);
+
+  return (
+    <div
+      aria-hidden
+      className={`pointer-events-none absolute inset-0 -z-10 overflow-hidden ${className}`}
+    >
+      {Background ? (
+        <Background {...componentProps} />
+      ) : (
+        <div className={`h-full w-full ${fallbackClassName}`} />
+      )}
+      {scrim ? (
+        <>
+          <div className="absolute inset-0 bg-background/30" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
+        </>
+      ) : null}
+    </div>
+  );
+}
+EOF
+
+  cat > "$dest/README.md" <<'EOF'
+# Backgrounds
+
+Animated / 3D background components from React Bits, bundled by the startup-kit
+scaffold. These are expressive surfaces for marketing, hero, auth, and splash —
+not for dense tool UI. See `references/backgrounds.md` for the full guidance.
+
+## Use one
+
+The parent must be a positioned box with height. Wrap the background with
+`AnimatedBackground` so it lazy-loads, falls back to a static gradient under
+`prefers-reduced-motion`, and keeps text legible:
+
+```tsx
+import { AnimatedBackground } from "@/components/backgrounds/animated-background";
+
+<section className="relative isolate overflow-hidden">
+  <AnimatedBackground
+    load={() => import("@/components/backgrounds/LiquidEther")}
+    componentProps={{ colors: ["#5227FF", "#FF9FFC", "#B497CF"] }}
+  />
+  <div className="relative z-10">{/* hero content */}</div>
+</section>
+```
+
+## Dependencies
+
+`three` and `ogl` are installed by default, which covers most components
+(LiquidEther, Prism, Aurora, Particles, Galaxy, Threads, and more).
+
+Components that need extra packages (postprocessing, @react-three/fiber, gsap,
+face-api.js) list them in `manifest.json`. Install any component's deps with:
+
+```bash
+scripts/add-background.sh <Name>          # e.g. Hyperspeed, Dither, DotGrid
+```
+
+`manifest.json` is the source of truth for every component's files and deps.
+EOF
+
+  # Pre-install the common WebGL runtimes so the popular backgrounds work out of the box.
+  (
+    cd "$web" || exit 1
+    if [ "$pm" = "pnpm" ]; then
+      pnpm add three ogl >/dev/null 2>&1 || true
+    else
+      npm install three ogl >/dev/null 2>&1 || true
     fi
   )
 }

@@ -1,6 +1,6 @@
 ---
 name: startup-kit
-description: Cross-agent full-stack startup kit for building skill UIs and shippable products. Frontend baseline with the default SF Pro theme, light/dark Tailwind tokens, shadcn/ui conventions, and references for forms, states, accessibility, layout, copy, demo content, auth, payments, SEO, and analytics. Backend baseline for a Node.js + TypeScript + Express + MongoDB/Mongoose API with a layered Router to Controller to Service to Model structure, middleware, and a standard response envelope. Includes a one-command scaffold and a mechanical pre-flight quality check. Use when Codex, Claude Code, or another coding agent needs to create or update UI for agent skills, skill dashboards, or reusable frontend starter projects; to design API routes, controllers, services, models, or a Node.js/Express backend file structure; or to stand up a complete product with consistent typography, colors, Tailwind configuration, shadcn/ui components, backend architecture, and production-launch surfaces. Helpful for beginners who ask how to create a backend, structure an Express app, or wire routing through to services.
+description: Cross-agent full-stack startup kit for building skill UIs and shippable products. ALWAYS run onboarding FIRST — never scaffold or build until you have interviewed the user (product, scope, style, theme, background animations, architecture, data, auth, payments, launch, deploy) or loaded their stored answers, and written a confirmed .startup-kit/intake.md. A "build me X" request triggers the interview, not the build. Frontend baseline with the default SF Pro theme, light/dark Tailwind tokens, shadcn/ui conventions, and references for forms, states, accessibility, layout, copy, demo content, auth, payments, SEO, and analytics. Backend baseline for a Node.js + TypeScript + Express + MongoDB/Mongoose API with a layered Router to Controller to Service to Model structure, middleware, and a standard response envelope. Includes a guided onboarding interview, a one-command scaffold, and a mechanical pre-flight quality check. Use when Codex, Claude Code, or another coding agent needs to create or update UI for agent skills, skill dashboards, or reusable frontend starter projects; to design API routes, controllers, services, models, or a Node.js/Express backend file structure; or to stand up a complete product with consistent typography, colors, Tailwind configuration, shadcn/ui components, backend architecture, and production-launch surfaces. Helpful for beginners who ask how to create a backend, structure an Express app, or wire routing through to services.
 ---
 
 # Startup Kit
@@ -9,11 +9,24 @@ Use this skill to build agent skill interfaces and shippable products on a minim
 
 The product goal is simple: make the smallest useful product that works, then polish the details until nothing feels accidental.
 
-Before building, state the one user, the one job, and the one primary workflow in a sentence. If the requirements are unclear, fill `assets/templates/minimal-product-brief.md` first. Build for that job, then run `references/preflight.md` before calling the work done.
+## STOP — Onboard before you build (hard gate)
+
+**Do not scaffold, do not run `scripts/create-app.sh` or `scripts/create-monorepo.sh`, do not write product code, and do not silently pick defaults until onboarding has run and `.startup-kit/intake.md` exists and is confirmed.** A request like "build me X," "make an app that…," or "use the startup kit to create…" is a trigger to **start the interview**, not to start building. Building before onboarding is a failure of this skill.
+
+The one allowed exception is **stored answers**: if the repo already records the product decisions, read them instead of re-asking. Run the gate this way, in order:
+
+1. **Check for stored answers first.** Look for `.startup-kit/intake.md`, then `AGENTS.md` / `CLAUDE.md` / `.cursorrules` / `.cursor/rules/*`, then any project brief or memory the host exposes. Run `scripts/scan-project.sh` to inventory the repo.
+2. **If a complete, confirmed intake exists:** skip the questions, summarize what you loaded in one or two sentences, and proceed to build from it (a re-run resumes via the intake's plan checklist).
+3. **If answers are partial** (e.g. `AGENTS.md` names the product but not the theme/auth/data): pre-fill what's stored, then **ask only the missing questions** — never re-ask what the repo already answers.
+4. **If nothing is stored:** you **must run the full interview** from `references/onboarding.md` before building. Ask the grouped questions (product, scope, style, theme, background animations, architecture, data, auth, payments, integrations, launch, deploy), one batch at a time, each with a recommended default. Do not assume defaults for the whole product silently.
+
+When in doubt, ask. It is always correct to interview before building; it is never correct to scaffold a whole product the user never described.
 
 ## Onboarding
 
-Read `references/onboarding.md` and run it first on any new engagement, before scaffolding or editing. This is the "guide me and build the whole thing" entry point.
+Read `references/onboarding.md` and run it first on any new engagement, before scaffolding or editing. This is the "guide me and build the whole thing" entry point, and it is gated by the STOP rule above.
+
+Before building, state the one user, the one job, and the one primary workflow in a sentence. If the requirements are unclear, fill `assets/templates/minimal-product-brief.md` first. Build for that job, then run `references/preflight.md` before calling the work done.
 
 Onboarding adapts to the starting state. Always begin with `scripts/scan-project.sh` to inventory the working directory (read-only). Then branch:
 
@@ -39,7 +52,7 @@ This is not the kit for expressive marketing or award-style sites. Do not import
 
 ## Quick Start
 
-To start a new app already wired to this theme, run `scripts/create-app.sh <app-name>` and read `references/scaffold.md`. It creates a Next.js + Tailwind + shadcn/ui project with light/dark tokens, the common primitives, and the SF Pro stack. For other stacks, copy the token blocks from `assets/tailwind/globals.css` and keep the same token names.
+Onboarding comes first (see the STOP gate above) — `scripts/create-app.sh` refuses to run until `.startup-kit/intake.md` exists. Once onboarding has written the intake, start a new app already wired to this theme with `scripts/create-app.sh <app-name>` and read `references/scaffold.md`. It creates a Next.js + Tailwind + shadcn/ui project with light/dark tokens, the common primitives, and the SF Pro stack. For other stacks, copy the token blocks from `assets/tailwind/globals.css` and keep the same token names.
 
 ## Defaults
 
@@ -122,11 +135,21 @@ Use animation only to clarify continuity, focus, feedback, or state change. Do n
 
 ## Backgrounds
 
-Use bundled background components only as opt-in expressive surfaces for marketing, hero, auth, and splash screens. Do not put animated backgrounds behind dense tool UI.
+Use bundled background components as expressive surfaces for marketing, hero, auth, and splash screens. Do not put animated backgrounds behind dense tool UI (dashboards, tables, forms).
 
 Read `references/backgrounds.md` before adding a background component.
 
-Use `assets/components/backgrounds/manifest.json` to see the approved set — 42 React Bits components (fluid, aurora, plasma, particle, grid, glitch, and 3D effects). Most are transparent WebGL canvases that fill their parent, so wrap them in a positioned element with an explicit height. Dependencies vary by component (`ogl`, `three`, `@react-three/fiber`/`@react-three/drei`, `postprocessing`, `face-api.js`, `gsap`, or none); the manifest's `dependencyGroups` lists what to install for each. Copy the matching `.jsx` and `.css` files together into the target app (three components — `Silk`, `Ballpit`, `LetterGlitch` — ship without CSS) and render the background behind content. Keep text contrast intact, use at most one expressive background per view, prefer the lighter options for long-lived surfaces, and provide a static fallback when `prefers-reduced-motion` is set.
+Default behavior: when a product has a landing/marketing/hero surface, wire one animated/3D background into it — do not ship a flat hero by default. Scaffolds bundle the full catalog into `src/components/backgrounds/`, install `three` + `ogl`, and provide the `animated-background.tsx` wrapper (lazy load + reduced-motion fallback + scrim). Use it:
+
+```tsx
+import { AnimatedBackground } from "@/components/backgrounds/animated-background";
+
+<AnimatedBackground load={() => import("@/components/backgrounds/LiquidEther")} />
+```
+
+For an existing app (no scaffold) or a component needing extra packages, run `scripts/add-background.sh <Name> [target]` — it copies the source and installs the right dependencies from the manifest (`scripts/add-background.sh all` for everything).
+
+Use `assets/components/backgrounds/manifest.json` to see the approved set — 42 React Bits components (fluid, aurora, plasma, particle, grid, glitch, and 3D effects). Most are transparent WebGL canvases that fill their parent, so wrap them in a positioned element with an explicit height. Dependencies vary by component (`ogl`, `three`, `@react-three/fiber`/`@react-three/drei`, `postprocessing`, `face-api.js`, `gsap`, or none); the manifest's `dependencyGroups` lists what to install for each. Three components — `Silk`, `Ballpit`, `LetterGlitch` — ship without CSS. Keep text contrast intact, use at most one expressive background per view, prefer the lighter options for long-lived surfaces, and provide a static fallback when `prefers-reduced-motion` is set.
 
 ## Forms
 

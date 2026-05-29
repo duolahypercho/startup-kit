@@ -13,6 +13,8 @@ set -euo pipefail
 KIT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=/dev/null
 . "$KIT_DIR/scripts/lib/workspace.sh"
+# shellcheck source=/dev/null
+. "$KIT_DIR/scripts/lib/versions.sh"
 
 BACKEND_DIR="${1:-.}"
 WS_NAME="${2:-$(basename "$(pwd)")}"
@@ -51,7 +53,7 @@ echo "Scaffolding apps/web (Next.js + Tailwind + shadcn/ui)..."
 PM="npm"; USE_PM_FLAG="--use-npm"
 if command -v pnpm >/dev/null 2>&1; then PM="pnpm"; USE_PM_FLAG="--use-pnpm"; fi
 
-npx --yes create-next-app@latest apps/web \
+npx --yes "create-next-app@${SK_NEXT_MAJOR}" apps/web \
   --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" \
   --no-turbopack "$USE_PM_FLAG"
 
@@ -60,7 +62,7 @@ ws_apply_web_theme_v3 "$KIT_DIR" "apps/web" "$PM"
 
 (
   cd apps/web
-  npx --yes shadcn@latest add --yes --overwrite \
+  npx --yes "shadcn@${SK_SHADCN_MAJOR}" add --yes --overwrite \
     button input label select textarea checkbox switch tabs \
     dialog dropdown-menu popover tooltip sheet table form card alert skeleton sonner
   npm pkg set name="web" >/dev/null 2>&1 || true
