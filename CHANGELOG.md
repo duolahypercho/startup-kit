@@ -3,7 +3,7 @@
 All notable changes to the startup kit are recorded here. This project follows
 [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## v0.2.0 — 2026-05-29
 
 ### Cross-agent install and updates
 
@@ -26,6 +26,15 @@ All notable changes to the startup kit are recorded here. This project follows
 - `scripts/check-update.sh` is the throttled, fail-open checker the hooks call;
   it emits Cursor/Claude/Codex-shaped output and never blocks a session.
 - `scripts/lib/merge-hook.js` performs the safe JSON edit (requires Node.js).
+
+### Hardening and tests
+
+- The session-start update check is non-interactive and hard-bounded by a
+  wall-clock timeout, so a slow network or credential prompt can never hang an
+  agent session.
+- `scripts/test/install.test.sh` (23 assertions) covers the installer, the
+  update checker, and the hook JSON merge; CI runs it on every push along with
+  `node --check`, `bash -n`, and shellcheck.
 
 ## v0.1.0 — 2026-05-29
 
