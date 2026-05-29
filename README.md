@@ -83,7 +83,7 @@ assets/
   shadcn/                    components.json (v4) and components.tailwind-v3.json
   icons/                     lucide/, simple-icons/, tabler/ starter SVGs + manifests
   components/backgrounds/    42 React Bits background components + manifest.json
-  templates/                 minimal-product brief, privacy policy, terms
+  templates/                 minimal-product brief, privacy policy, terms, ui/ reference layouts
   fonts/                     SF Pro install target (vendor/ is gitignored)
 scripts/                     create-app and asset/font/skill download helpers
 ```

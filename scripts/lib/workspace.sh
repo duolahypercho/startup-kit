@@ -51,6 +51,7 @@ EOF
     cat > turbo.json <<'EOF'
 {
   "$schema": "https://turbo.build/schema.json",
+  "daemon": false,
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
