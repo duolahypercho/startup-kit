@@ -36,6 +36,10 @@ git clone https://github.com/duolahypercho/startup-kit.git ~/.startup-kit
 
 Then reload each agent (e.g. Cursor: Reload Window) and the skill is available.
 
+If `setup.sh` replaced an older copy, it left a timestamped backup (e.g.
+`startup-kit.bak.20260529172055`) next to the new link. Once you've confirmed the
+skill works, you can delete those backups: `rm -rf ~/.cursor/skills/startup-kit.bak.*`.
+
 ### Updating
 
 ```bash
