@@ -25,5 +25,11 @@ jobs:
       - name: Shellcheck
         run: shellcheck --severity=warning scripts/*.sh scripts/lib/*.sh scripts/test/*.sh
 
+      - name: Node syntax check
+        run: node --check scripts/lib/merge-hook.js
+
       - name: Onboarding gate tests
         run: bash scripts/test/onboarding.test.sh
+
+      - name: Installer and update-hook tests
+        run: bash scripts/test/install.test.sh

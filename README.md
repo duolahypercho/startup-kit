@@ -249,6 +249,7 @@ scripts/                     create-app and asset/font/skill download helpers
 - `scripts/download-lucide-icons.sh`, `download-simple-icons.sh`, `download-tabler-icons.sh`: refresh bundled icon sets.
 - `scripts/install-gsap-skills.sh`: install the official GreenSock GSAP skills when not already present.
 - `scripts/test/onboarding.test.sh`: tests for the onboarding gate and intake validator (run by CI in `.github/workflows/ci.yml`, along with `bash -n` and shellcheck).
+- `scripts/test/install.test.sh`: tests for the cross-agent installer (`setup.sh`), the update checker (`check-update.sh`), and the hook JSON merge (`merge-hook.js`); also run by CI.
 
 ## Fonts and licensing
 
