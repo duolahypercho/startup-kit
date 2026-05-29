@@ -6,29 +6,29 @@ set -euo pipefail
 
 APP_NAME="${1:-startup-app}"
 KIT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=/dev/null
+. "$KIT_DIR/scripts/lib/workspace.sh"
 
 if ! command -v npx >/dev/null 2>&1; then
   echo "npx is required."
   exit 1
 fi
 
-npx create-next-app@latest "$APP_NAME" \
-  --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --no-turbopack
+npx --yes create-next-app@latest "$APP_NAME" \
+  --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" \
+  --no-turbopack --use-npm
+
+# Apply the kit theme and pin Tailwind to v3 to match the kit assets.
+ws_apply_web_theme_v3 "$KIT_DIR" "$APP_NAME" "npm"
 
 cd "$APP_NAME"
 
-# Theme: replace the generated global stylesheet with the kit baseline.
-cp "$KIT_DIR/assets/tailwind/globals.css" "src/app/globals.css"
-mkdir -p src/styles
-cp "$KIT_DIR/assets/theme/default-theme.css" "src/styles/default-theme.css"
-cp "$KIT_DIR/assets/theme/dark-theme.css" "src/styles/dark-theme.css"
-
-# shadcn/ui init using the kit config.
-cp "$KIT_DIR/assets/shadcn/components.tailwind-v3.json" "components.json"
-npx shadcn@latest add button input label select textarea checkbox switch tabs \
+# shadcn/ui primitives using the kit config.
+npx --yes shadcn@latest add --yes --overwrite \
+  button input label select textarea checkbox switch tabs \
   dialog dropdown-menu popover tooltip sheet table form card alert skeleton sonner
 
-# Theme provider for dark mode.
+# Theme provider for dark mode + common product deps.
 npm install next-themes react-hook-form zod @hookform/resolvers lucide-react
 
 echo ""

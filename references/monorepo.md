@@ -56,7 +56,7 @@ Scaffold it with `scripts/create-monorepo.sh <name>`. The web app follows the sa
 The repo connects to each platform once. Each build is scoped to its own subfolder, so an unrelated change does not redeploy everything.
 
 - **Vercel** — set the project **Root Directory** to `apps/web`. Vercel detects the monorepo, installs from the workspace root, and builds only that app. Add a Turborepo "ignored build step" so a deploy is skipped when `apps/web` and its dependencies are unchanged.
-- **Koyeb** — point the service's build context at `apps/api` (a `Dockerfile` in that folder, or a build command like `pnpm --filter api build` with run command `pnpm --filter api start`).
+- **Koyeb** — two supported options. With the **buildpack**, set the build command to `pnpm exec turbo run build --filter=api` and the run command to `pnpm --filter api start` (both run from the repo root, so `packages/shared` builds first). With the **Dockerfile** (`apps/api/Dockerfile`), set the build context to the **repository root** (not `apps/api`) and the Dockerfile path to `apps/api/Dockerfile`, and commit `pnpm-lock.yaml` — the Dockerfile copies the whole workspace so the lockfile and `packages/shared` are present.
 - **Supabase** — no folder deploys. Keep `supabase/` migrations and Edge Functions in the repo and apply them with the Supabase CLI; the database itself is hosted by Supabase.
 
 Both platforms watch the **same GitHub repo**. A push triggers each independently.
@@ -70,7 +70,7 @@ Both platforms watch the **same GitHub repo**. A push triggers each independentl
 
 ## CLI Tooling
 
-Install the three platform CLIs with `scripts/install-deploy-clis.sh` (Vercel and Koyeb via npm; Supabase via npm or Homebrew). Each authenticates against its own account; none of them commit secrets to the repo.
+Install the three platform CLIs with `scripts/install-deploy-clis.sh`, which uses each tool's official method: Vercel via npm, Koyeb via Homebrew or its install script (there is no official npm package), and Supabase via Homebrew or the standalone binary (a global `npm i -g supabase` is not supported). Each authenticates against its own account; none of them commit secrets to the repo.
 
 ### Vercel CLI
 
@@ -88,8 +88,10 @@ Set the project Root Directory to `apps/web` in the dashboard or during `vercel 
 
 ### Supabase CLI
 
+Global `npm i -g supabase` is not supported. Install via Homebrew (or Scoop on Windows / the standalone binary), or run it with `npx supabase` without installing — both shown below.
+
 ```bash
-npm i -g supabase           # or: brew install supabase/tap/supabase
+brew install supabase/tap/supabase   # macOS/Linux; or run: npx supabase <command>
 supabase login
 supabase init               # creates supabase/ in the repo
 supabase link --project-ref <ref>
@@ -100,8 +102,10 @@ supabase start              # optional: run the full stack locally in Docker
 
 ### Koyeb CLI
 
+There is no official npm package for the Koyeb CLI. Install via Homebrew, or the official install script (binary lands in `~/.koyeb/bin`).
+
 ```bash
-npm i -g koyeb               # or use the official install script
+brew install koyeb/tap/koyeb   # or: curl -fsSL https://raw.githubusercontent.com/koyeb/koyeb-cli/master/install.sh | sh
 koyeb login
 koyeb app init <name> \
   --git github.com/<org>/<repo> \

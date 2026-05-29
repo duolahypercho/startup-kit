@@ -29,19 +29,33 @@ Ask only what the scan cannot answer:
 - **Direction**: the quiet SF Pro default (tool UI), a preset (`linear`, `vercel`, `notion`), or a custom brand. For custom, collect font, primary color, and logo, then map them onto the token contract (`references/themes.md`, `references/theming.md`) — change token values, never names.
 - **Product type**: tool/dashboard vs marketing/landing. This decides whether expressive backgrounds are allowed at all (`references/backgrounds.md`); dense tool UI gets none.
 
-### Step 2 — Architecture and path
+### Step 2 — Choose the architecture (present this as a real choice)
 
-Confirm the detected starting state, then choose exactly one path:
+This is the key decision. Present it to the user explicitly as two options, and **recommend the single app by default**. Do not default anyone into a monorepo.
 
-| Detected starting state | Path | How |
-| --- | --- | --- |
-| Nothing yet (greenfield) | `create-monorepo` or single app | `scripts/create-monorepo.sh` / `scripts/create-app.sh` |
-| Existing frontend only | `add-backend` | `scripts/add-backend.sh` |
-| Existing backend only | `add-frontend` | `scripts/add-frontend.sh` |
-| Existing frontend + backend in one repo | `adopt-monorepo` | `scripts/adopt-monorepo.sh` |
-| Two separate repos, or "leave it as-is" | `wire-existing` | no restructure; connect via env + CORS (`references/monorepo.md`) |
+**Option A — Single app (the default).** One Next.js app on Vercel: React for the frontend, Route Handlers for the API, and Supabase for data, auth, and storage. Fewer moving parts, faster to ship, less to maintain. This is the right answer for an MVP, a skill UI, a dashboard, or anything whose backend is "endpoints + a database."
 
-Then pick hosting: a single Next.js app on Vercel, or the split — Vercel (`apps/web`) + Koyeb (`apps/api`) + Supabase (data/auth). Use the decision table in `references/monorepo.md`. The monorepo is a convenience, never a prerequisite: if the user wants to keep their structure, choose `wire-existing` and only generate connection glue.
+**Option B — Monorepo split hosting (opt-in, advanced).** `apps/web` on Vercel + `apps/api` on Koyeb + `packages/shared`, with Supabase for data. It costs more setup and maintenance (pnpm workspaces, Turborepo, a shared build, separate deploys), so only choose it when at least one is true:
+
+- the backend must be **always-on** — websockets, background jobs, queues, cron, or long-running requests that don't fit serverless;
+- you need a **shared, typed contract across two independently deployed apps**;
+- there will be **more than two deployables** (e.g. web + admin + api).
+
+If none of those hold, choose Option A. State the recommendation, let the user decide, and record both the choice and — for Option B — which criterion justified it.
+
+### Step 2b — Pick the path for the chosen architecture and starting state
+
+| Architecture | Detected starting state | Path | How |
+| --- | --- | --- | --- |
+| Single app | Nothing yet | `create-app` | `scripts/create-app.sh`, then wire Supabase (`references/auth.md`, `references/backend.md`) |
+| Single app | Existing Next.js app | `wire-existing` | keep it; add Route Handlers + Supabase, apply the kit theme |
+| Monorepo | Nothing yet | `create-monorepo` | `scripts/create-monorepo.sh` |
+| Monorepo | Existing frontend only | `add-backend` | `scripts/add-backend.sh` |
+| Monorepo | Existing backend only | `add-frontend` | `scripts/add-frontend.sh` |
+| Monorepo | Existing frontend + backend in one repo | `adopt-monorepo` | `scripts/adopt-monorepo.sh` |
+| Either | Two separate repos, or "leave it as-is" | `wire-existing` | no restructure; connect via env + CORS (`references/monorepo.md`) |
+
+The monorepo is a convenience, never a prerequisite: if the user wants to keep their structure, choose `wire-existing` and only generate connection glue.
 
 ### Step 3 — If code exists, understand it and write it down
 
@@ -68,7 +82,8 @@ Onboarding is idempotent. Running it again re-scans, refreshes the intake, and r
 
 - Detect before asking. Run `scripts/scan-project.sh`, read the real files, and report findings before any question.
 - Never modify source during onboarding. The only write is `.startup-kit/intake.md`.
-- Ask only what cannot be inferred; keep it to style and the few architecture choices.
+- Ask only what cannot be inferred; keep it to style and the architecture choice.
+- Present the architecture as a real choice and default to the single app. Only choose the monorepo when a stated criterion holds (always-on backend, shared contract across 2+ deployed apps, or 3+ deployables), and record which one.
 - One path only. Pick a single starting-state path and a single hosting choice, and record both.
 - Treat the monorepo as optional. If the user wants their structure left alone, choose `wire-existing`.
 - Always write down the existing file structure and a concrete gap analysis for existing code — vague "looks fine" is not acceptable.

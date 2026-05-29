@@ -74,9 +74,7 @@ EOF
     "moduleResolution": "Bundler",
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "declaration": true,
-    "composite": true
+    "skipLibCheck": true
   }
 }
 EOF
@@ -121,15 +119,25 @@ ws_write_shared() {
     return 0
   fi
   mkdir -p packages/shared/src
+  # Built to dist (CommonJS + declarations) and consumed via node_modules, so both
+  # the tsc-built api and the Next.js web app import it as a normal dependency.
+  # turbo's build dependsOn ^build ensures shared compiles before its consumers.
   cat > packages/shared/package.json <<'EOF'
 {
   "name": "@repo/shared",
   "version": "0.0.0",
   "private": true,
-  "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
-  "scripts": { "lint": "echo \"no lint\"", "typecheck": "tsc --noEmit" },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch --preserveWatchOutput",
+    "lint": "echo \"no lint\"",
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": { "zod": "^3.23.0" },
   "devDependencies": { "typescript": "^5.5.0" }
 }
@@ -137,7 +145,14 @@ EOF
   cat > packages/shared/tsconfig.json <<'EOF'
 {
   "extends": "../../tsconfig.base.json",
-  "compilerOptions": { "outDir": "dist", "rootDir": "src" },
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "rootDir": "src",
+    "composite": false,
+    "declaration": true
+  },
   "include": ["src/**/*"]
 }
 EOF
@@ -223,13 +238,18 @@ JWT_TOKEN=
 CORS_ORIGINS=http://localhost:3000
 EOF
 
+  # NOTE: build context is the MONOREPO ROOT (not apps/api) so the workspace,
+  # lockfile, and packages/shared are available. On Koyeb set the build context
+  # to the repo root and the Dockerfile path to apps/api/Dockerfile, and commit
+  # pnpm-lock.yaml. turbo builds packages/shared before api.
   cat > apps/api/Dockerfile <<'EOF'
+# Build context: monorepo root.
 FROM node:20-slim AS build
 WORKDIR /app
 RUN corepack enable
 COPY . .
 RUN pnpm install --frozen-lockfile
-RUN pnpm --filter api build
+RUN pnpm exec turbo run build --filter=api
 
 FROM node:20-slim AS run
 WORKDIR /app
@@ -267,19 +287,27 @@ EOF
 
   cat > apps/api/src/controllers/HealthController.ts <<'EOF'
 import { Request, Response } from "express";
+import type { ApiResponse } from "@repo/shared";
 import { checkHealth } from "../services/HealthService";
 
 export const getHealth = async (_req: Request, res: Response) => {
   try {
     const data = await checkHealth();
-    return res.status(200).json({ success: true, status: 200, code: "OK", data });
+    const body: ApiResponse<typeof data> = {
+      success: true,
+      status: 200,
+      code: "OK",
+      data,
+    };
+    return res.status(200).json(body);
   } catch (e: any) {
-    return res.status(500).json({
+    const body: ApiResponse<never> = {
       success: false,
       status: 500,
       code: "INTERNAL_ERROR",
       error: e.message,
-    });
+    };
+    return res.status(500).json(body);
   }
 };
 EOF
@@ -310,6 +338,55 @@ app.listen(config.port, () => {
 });
 EOF
   echo "  + apps/api (layered Express + TypeScript)"
+}
+
+# Apply the kit theme to a freshly created Next.js app and pin Tailwind to v3.
+# create-next-app now scaffolds Tailwind v4 (CSS-first, no config file), but the
+# kit's globals.css and shadcn config target v3 — so we install v3 explicitly and
+# write the matching tailwind.config.ts + postcss config.
+# $1 = kit dir, $2 = path to the web app, $3 = package manager (pnpm|npm)
+ws_apply_web_theme_v3() {
+  local kit="$1" web="$2" pm="${3:-npm}"
+
+  cp "$kit/assets/tailwind/globals.css" "$web/src/app/globals.css"
+  mkdir -p "$web/src/styles"
+  cp "$kit/assets/theme/default-theme.css" "$web/src/styles/default-theme.css"
+  cp "$kit/assets/theme/dark-theme.css" "$web/src/styles/dark-theme.css"
+  cp "$kit/assets/tailwind/tailwind.config.ts" "$web/tailwind.config.ts"
+  cp "$kit/assets/shadcn/components.tailwind-v3.json" "$web/components.json"
+
+  (
+    cd "$web"
+    # Drop the v4 toolchain create-next-app installed, pin v3, and write configs.
+    # tailwindcss-animate is required by the kit's tailwind.config.ts.
+    if [ "$pm" = "pnpm" ]; then
+      pnpm remove tailwindcss @tailwindcss/postcss >/dev/null 2>&1 || true
+      pnpm add -D "tailwindcss@^3" postcss autoprefixer tailwindcss-animate >/dev/null 2>&1
+      # shadcn base runtime deps — normally added by `shadcn init`, which we skip
+      # because we ship our own components.json, globals.css, and tailwind config.
+      pnpm add class-variance-authority clsx tailwind-merge lucide-react >/dev/null 2>&1
+    else
+      npm uninstall tailwindcss @tailwindcss/postcss >/dev/null 2>&1 || true
+      npm install -D "tailwindcss@^3" postcss autoprefixer tailwindcss-animate >/dev/null 2>&1
+      npm install class-variance-authority clsx tailwind-merge lucide-react >/dev/null 2>&1
+    fi
+    rm -f postcss.config.mjs postcss.config.js
+    cat > postcss.config.js <<'PCFG'
+module.exports = { plugins: { tailwindcss: {}, autoprefixer: {} } };
+PCFG
+    # The cn() helper shadcn components import from @/lib/utils.
+    mkdir -p src/lib
+    if [ ! -f src/lib/utils.ts ]; then
+      cat > src/lib/utils.ts <<'CN'
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+CN
+    fi
+  )
 }
 
 # Resolve the kit root from a script that sourced this lib.

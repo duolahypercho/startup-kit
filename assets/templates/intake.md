@@ -17,9 +17,11 @@ The persistent source of truth for this product. Onboarding fills it; every late
 
 ## 3. Architecture
 
+- Architecture: <!-- single-app (DEFAULT) | monorepo (opt-in) -->
+- If monorepo, why: <!-- always-on backend | shared contract across 2+ deployed apps | 3+ deployables -->
 - Starting state: <!-- greenfield | existing frontend | existing backend | existing both | two repos -->
-- Chosen path: <!-- create-monorepo | add-backend | add-frontend | adopt-monorepo | wire-existing | single Next.js app -->
-- Hosting: <!-- single Next.js on Vercel | Vercel (web) + Koyeb (api) + Supabase (data) -->
+- Chosen path: <!-- create-app | create-monorepo | add-backend | add-frontend | adopt-monorepo | wire-existing -->
+- Hosting: <!-- single Next.js + Supabase on Vercel | Vercel (web) + Koyeb (api) + Supabase (data) -->
 
 ## 4. Existing Code (from scripts/scan-project.sh)
 

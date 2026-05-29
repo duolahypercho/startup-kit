@@ -47,18 +47,21 @@ fi
 ws_write_shared
 
 echo "Scaffolding apps/web (Next.js + Tailwind + shadcn/ui)..."
-npx create-next-app@latest apps/web \
-  --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --no-turbopack
+# Use pnpm when available so the new app matches the pnpm workspace.
+PM="npm"; USE_PM_FLAG="--use-npm"
+if command -v pnpm >/dev/null 2>&1; then PM="pnpm"; USE_PM_FLAG="--use-pnpm"; fi
 
-# Theme wiring (mirrors scripts/create-app.sh).
-cp "$KIT_DIR/assets/tailwind/globals.css" "apps/web/src/app/globals.css"
-mkdir -p apps/web/src/styles
-cp "$KIT_DIR/assets/theme/default-theme.css" "apps/web/src/styles/default-theme.css"
-cp "$KIT_DIR/assets/theme/dark-theme.css" "apps/web/src/styles/dark-theme.css"
-cp "$KIT_DIR/assets/shadcn/components.tailwind-v3.json" "apps/web/components.json"
+npx --yes create-next-app@latest apps/web \
+  --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" \
+  --no-turbopack "$USE_PM_FLAG"
+
+# Apply the kit theme and pin Tailwind to v3 to match the kit assets.
+ws_apply_web_theme_v3 "$KIT_DIR" "apps/web" "$PM"
+
 (
   cd apps/web
-  npx shadcn@latest add button input label select textarea checkbox switch tabs \
+  npx --yes shadcn@latest add --yes --overwrite \
+    button input label select textarea checkbox switch tabs \
     dialog dropdown-menu popover tooltip sheet table form card alert skeleton sonner
   npm pkg set name="web" >/dev/null 2>&1 || true
   npm pkg set dependencies.@repo/shared="workspace:*" >/dev/null 2>&1 || true

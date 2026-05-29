@@ -15,13 +15,14 @@ Before building, state the one user, the one job, and the one primary workflow i
 
 Read `references/onboarding.md` and run it first on any new engagement, before scaffolding or editing.
 
-Onboarding is the entry point that routes a user to the one path that fits them. Detect first, then ask: run `scripts/scan-project.sh` to inventory any existing code, report what was found, and only ask what cannot be inferred (style and the few architecture choices). For existing frontends or backends, inspect the code and write down its file structure plus a concrete gap analysis against the kit's conventions — never modify source during onboarding. Capture everything in `.startup-kit/intake.md` (from `assets/templates/intake.md`); it is the source of truth every later session reads. Finish by choosing a single path and stating the next command:
+Onboarding is the entry point that routes a user to the one path that fits them. Detect first, then ask: run `scripts/scan-project.sh` to inventory any existing code, report what was found, and only ask what cannot be inferred (style and the architecture choice). For existing frontends or backends, inspect the code and write down its file structure plus a concrete gap analysis against the kit's conventions — never modify source during onboarding. Capture everything in `.startup-kit/intake.md` (from `assets/templates/intake.md`); it is the source of truth every later session reads.
 
-- Greenfield: `scripts/create-app.sh` (single app) or `scripts/create-monorepo.sh` (split hosting).
-- Existing frontend only: `scripts/add-backend.sh`.
-- Existing backend only: `scripts/add-frontend.sh`.
-- Existing frontend + backend in one repo: `scripts/adopt-monorepo.sh` (restructures in place with `git mv`, preserving history).
-- Two repos or "leave it as-is": wire-only via env + CORS (`references/monorepo.md`). The monorepo is a convenience, not a prerequisite.
+Present the architecture as an explicit choice and **default to the single app**:
+
+- **Single app (default):** one Next.js app on Vercel (Route Handlers for the API) + Supabase for data/auth. Right for MVPs, skill UIs, dashboards, and anything whose backend is "endpoints + a database." Use `scripts/create-app.sh`.
+- **Monorepo split hosting (opt-in, advanced):** `apps/web` on Vercel + `apps/api` on Koyeb + `packages/shared`. Only when the backend must be always-on (websockets, jobs, cron, long requests), a typed contract is shared across 2+ deployed apps, or there are 3+ deployables. Scaffold with `scripts/create-monorepo.sh`; adopt existing code with `scripts/add-backend.sh`, `scripts/add-frontend.sh`, or `scripts/adopt-monorepo.sh`.
+
+If none of the monorepo criteria hold, choose the single app. The monorepo is a convenience, not a prerequisite; for "leave it as-is," wire via env + CORS (`references/monorepo.md`). Finish by recording the choice and stating the next command.
 
 ## Scope
 
