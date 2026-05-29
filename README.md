@@ -11,8 +11,9 @@ The philosophy is restraint: make the smallest useful product that works, then p
 - Three opt-in brand presets modeled on Linear, Vercel, and Notion.
 - Tailwind v3 and v4 configs plus shadcn/ui setup with `cssVariables` enabled.
 - Bundled icon starter sets (Lucide, Simple Icons, Tabler) and 42 React Bits background components.
-- Twenty focused reference docs covering forms, states, accessibility, layout, copy, auth, payments, SEO, analytics, and more.
-- A one-command scaffold and a mechanical pre-flight quality gate.
+- A layered Node/TypeScript/Express backend reference, plus a monorepo pattern for keeping the frontend and backend in one repo while hosting them on different platforms (Vercel + Supabase + Koyeb).
+- Focused reference docs covering forms, states, accessibility, layout, copy, auth, payments, SEO, analytics, backend, and deployment.
+- One-command scaffolds (single app or monorepo) and a mechanical pre-flight quality gate.
 
 ## Quick start
 
@@ -25,6 +26,17 @@ npm run dev
 ```
 
 This creates a Next.js App Router + TypeScript + Tailwind + shadcn/ui project with the light and dark token blocks, the common primitives, and the SF Pro stack. See `references/scaffold.md` for other stacks (Vite, Remix, Astro, Vue, Svelte): copy the token blocks from `assets/tailwind/globals.css` and keep the same token names.
+
+## Monorepo and split hosting
+
+When a product needs a real backend, keep the frontend and backend in one repo but deploy each to the host that fits it:
+
+```bash
+scripts/create-monorepo.sh my-product   # apps/web + apps/api + packages/shared
+scripts/install-deploy-clis.sh           # vercel, supabase, koyeb CLIs
+```
+
+This scaffolds a pnpm + Turborepo workspace: `apps/web` (Next.js on the kit theme) deploys to **Vercel**, `apps/api` (layered Express/TypeScript) deploys to **Koyeb** for always-on work, and **Supabase** provides managed Postgres, auth, and storage. The request/response contract and `zod` schemas live in `packages/shared` so both sides stay in sync. See `references/monorepo.md` for wiring, env vars, CORS, and the platform CLI commands.
 
 ## Using it as an agent skill
 
@@ -90,6 +102,8 @@ scripts/                     create-app and asset/font/skill download helpers
 | `payments.md` | Stripe checkout, webhooks, entitlements |
 | `seo.md` | Metadata, OG images, error/not-found pages |
 | `analytics.md` | Privacy-respecting product analytics |
+| `backend.md` | Layered Node/TypeScript/Express API structure |
+| `monorepo.md` | One repo, split hosting (Vercel + Supabase + Koyeb) |
 | `legal.md` | Privacy policy and terms templates |
 | `scaffold.md` | The create-app script and other stacks |
 | `preflight.md` | Mechanical done-check before shipping |
@@ -97,6 +111,8 @@ scripts/                     create-app and asset/font/skill download helpers
 ## Scripts
 
 - `scripts/create-app.sh <name>`: scaffold a themed Next.js app.
+- `scripts/create-monorepo.sh <name>`: scaffold a pnpm + Turborepo monorepo (`apps/web` + `apps/api` + `packages/shared`) for split hosting on Vercel, Supabase, and Koyeb.
+- `scripts/install-deploy-clis.sh`: install the Vercel, Supabase, and Koyeb CLIs.
 - `scripts/download-sf-pro.sh`: download Apple's official SF Pro installer into `assets/fonts/vendor/`.
 - `scripts/download-lucide-icons.sh`, `download-simple-icons.sh`, `download-tabler-icons.sh`: refresh bundled icon sets.
 - `scripts/install-gsap-skills.sh`: install the official GreenSock GSAP skills when not already present.

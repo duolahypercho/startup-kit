@@ -1,6 +1,6 @@
 ---
 name: startup-kit
-description: Cross-agent frontend startup kit for building skill UIs and shippable products with the default SF Pro theme, light/dark Tailwind tokens, shadcn/ui conventions, and references for forms, states, accessibility, layout, copy, demo content, auth, payments, SEO, and analytics. Includes a one-command scaffold and a mechanical pre-flight quality check. Use when Codex, Claude Code, or another coding agent needs to create or update UI for agent skills, skill dashboards, or reusable frontend starter projects, or to stand up a complete product with consistent typography, colors, Tailwind configuration, shadcn/ui components, and production-launch surfaces.
+description: Cross-agent full-stack startup kit for building skill UIs and shippable products. Frontend baseline with the default SF Pro theme, light/dark Tailwind tokens, shadcn/ui conventions, and references for forms, states, accessibility, layout, copy, demo content, auth, payments, SEO, and analytics. Backend baseline for a Node.js + TypeScript + Express + MongoDB/Mongoose API with a layered Router to Controller to Service to Model structure, middleware, and a standard response envelope. Includes a one-command scaffold and a mechanical pre-flight quality check. Use when Codex, Claude Code, or another coding agent needs to create or update UI for agent skills, skill dashboards, or reusable frontend starter projects; to design API routes, controllers, services, models, or a Node.js/Express backend file structure; or to stand up a complete product with consistent typography, colors, Tailwind configuration, shadcn/ui components, backend architecture, and production-launch surfaces. Helpful for beginners who ask how to create a backend, structure an Express app, or wire routing through to services.
 ---
 
 # Startup Kit
@@ -138,10 +138,23 @@ Read `references/content.md` before writing example data, empty states, or socia
 
 Use realistic, specific content even in examples. No generic names ("John Doe"), slop brand names ("Acme"), fake-perfect numbers (`99.99%`), text-only logo walls, `<div>`-based fake screenshots, or em dashes. Use the bundled Simple Icons for real brand logos.
 
+## Backend
+
+Read `references/backend.md` before building a backend, designing API routes, or wiring a database.
+
+Build the backend as a Node.js + TypeScript + Express service with a strict layered flow: Router → Controller → Service → Model, and back. Controllers own HTTP (`req`/`res`) and shape responses; services own business logic and database access; models hold only the Mongoose schema and its type. Use one file per domain per layer, a single JSON response envelope (`{ success, status, code, message/error, data }`), authentication in middleware, and keep all secrets in `.env`.
+
+## Monorepo And Split Hosting
+
+Read `references/monorepo.md` before splitting a product into separate frontend and backend deployments.
+
+Keep the frontend and backend in one repository, but deploy each to the host that fits it: `apps/web` (Next.js) to Vercel, `apps/api` (Express/Fastify) to Koyeb for always-on work, and Supabase for managed Postgres, auth, and storage. Use pnpm workspaces + Turborepo, share the request/response contract and `zod` schemas through `packages/shared`, scope each platform's build to its own folder, and keep public values in `NEXT_PUBLIC_*` with all other secrets server-side. Scaffold it with `scripts/create-monorepo.sh <name>` and install the platform CLIs with `scripts/install-deploy-clis.sh`.
+
 ## Auth, Payments, And Launch Surfaces
 
 These references apply when building a shippable product rather than a single skill UI.
 
+- `references/backend.md`: layer the server route → controller → service → repository; validate input at the edge; centralize error mapping.
 - `references/auth.md`: use a managed auth provider; protect routes on the server; never store tokens in `localStorage`.
 - `references/payments.md`: use Stripe; let it own card data and checkout; treat the webhook as the source of truth for entitlements.
 - `references/seo.md`: set per-route metadata, OG images via `next/og`, and real `not-found`/`error` pages using the theme.
