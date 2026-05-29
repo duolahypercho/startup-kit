@@ -1,0 +1,22 @@
+.dark {
+  color-scheme: dark;
+
+  --color-text-subtle: #8a8a8a;
+  --color-text-default: #a1a1a1;
+  --color-text-strong: #f5f5f5;
+  --color-bg-selected: #1a1a1a;
+  --color-border: #1f1f1f;
+
+  color: var(--color-text-default);
+  background: #0a0a0a;
+}
+
+.dark body {
+  color: var(--color-text-default);
+  background: #0a0a0a;
+}
+
+.dark strong,
+.dark b {
+  color: var(--color-text-strong);
+}

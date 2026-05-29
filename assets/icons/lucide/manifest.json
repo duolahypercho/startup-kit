@@ -1,0 +1,22 @@
+{
+  "library": "Lucide",
+  "source": "https://github.com/lucide-icons/lucide",
+  "license": "ISC, with some Feather-derived icons under MIT as noted in LICENSE",
+  "icons": [
+    { "name": "play", "purpose": "Run or start action" },
+    { "name": "settings", "purpose": "Settings or configuration" },
+    { "name": "terminal", "purpose": "Terminal or command output" },
+    { "name": "file", "purpose": "File or artifact" },
+    { "name": "circle-check", "purpose": "Success state" },
+    { "name": "triangle-alert", "purpose": "Warning or validation issue" },
+    { "name": "loader-circle", "purpose": "Loading or in-progress state" },
+    { "name": "download", "purpose": "Download action" },
+    { "name": "bot", "purpose": "Agent or automation" },
+    { "name": "panel-left", "purpose": "Sidebar or navigation panel" },
+    { "name": "search", "purpose": "Search" },
+    { "name": "plus", "purpose": "Add or create" },
+    { "name": "x", "purpose": "Close or remove" },
+    { "name": "command", "purpose": "Command palette or shortcuts" },
+    { "name": "database", "purpose": "Data source or storage" }
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Startup Kit"
+  short_description: "Minimal product + UI kit for agent skills and shippable apps"
+  default_prompt: "Use $startup-kit to scaffold and build a minimal product with the default SF Pro theme, light/dark tokens, Tailwind settings, shadcn/ui components, Lucide icons, restrained GSAP animation, and the bundled references for forms, states, accessibility, layout, copy, auth, payments, SEO, and analytics."

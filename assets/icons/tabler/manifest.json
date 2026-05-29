@@ -1,0 +1,15 @@
+{
+  "library": "Tabler Icons",
+  "source": "https://github.com/tabler/tabler-icons",
+  "usage": "Fallback UI icons only when Lucide lacks the needed concept. Do not mix with Lucide in the same screen unless necessary.",
+  "icons": [
+    { "name": "brand-github-copilot", "purpose": "Copilot-specific integration fallback" },
+    { "name": "robot", "purpose": "Alternate automation or agent fallback" },
+    { "name": "file-diff", "purpose": "Diff or patch fallback" },
+    { "name": "status-change", "purpose": "State transition fallback" },
+    { "name": "timeline-event", "purpose": "Timeline event fallback" },
+    { "name": "schema", "purpose": "Schema or structured data fallback" },
+    { "name": "route", "purpose": "Workflow route fallback" },
+    { "name": "plug-connected", "purpose": "Connector or integration fallback" }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "colorScheme": "dark",
+  "color": {
+    "text": {
+      "subtle": "#8a8a8a",
+      "default": "#a1a1a1",
+      "strong": "#f5f5f5"
+    },
+    "background": {
+      "base": "#0a0a0a",
+      "selected": "#1a1a1a"
+    },
+    "border": {
+      "default": "#1f1f1f"
+    }
+  }
+}
