@@ -1,6 +1,10 @@
 ---
 name: startup-kit
 description: Cross-agent full-stack startup kit for building skill UIs and shippable products. ALWAYS run onboarding FIRST — never scaffold or build until you have interviewed the user (product, scope, style, theme, background animations, architecture, data, auth, payments, launch, deploy) or loaded their stored answers, and written a confirmed .startup-kit/intake.md. A "build me X" request triggers the interview, not the build. Frontend baseline with the default SF Pro theme, light/dark Tailwind tokens, shadcn/ui conventions, and references for forms, states, accessibility, layout, copy, demo content, auth, payments, SEO, and analytics. Backend baseline for a Node.js + TypeScript + Express + MongoDB/Mongoose API with a layered Router to Controller to Service to Model structure, middleware, and a standard response envelope. Includes a guided onboarding interview, a one-command scaffold, and a mechanical pre-flight quality check. Use when Codex, Claude Code, or another coding agent needs to create or update UI for agent skills, skill dashboards, or reusable frontend starter projects; to design API routes, controllers, services, models, or a Node.js/Express backend file structure; or to stand up a complete product with consistent typography, colors, Tailwind configuration, shadcn/ui components, backend architecture, and production-launch surfaces. Helpful for beginners who ask how to create a backend, structure an Express app, or wire routing through to services.
+license: MIT
+metadata:
+  author: duolahypercho
+  version: "1.0.0"
 ---
 
 # Startup Kit

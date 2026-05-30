@@ -16,9 +16,36 @@ The philosophy is restraint: make the smallest useful product that works, then p
 
 This README has two kinds of reader. Jump to the one that's you:
 
+- **Anyone who just wants the kit installed** → ["Install in one command"](#install-in-one-command)
 - **A person who wants to build something** → ["For people: no coding needed"](#for-people-no-coding-needed)
 - **An AI agent asked to use the kit** → ["For AI agents: start here"](#for-ai-agents-start-here)
 - **A developer who wants the commands** → ["Quick start (for developers)"](#quick-start-for-developers)
+
+## Install in one command
+
+The kit is published as a public agent skill, so **anyone** can install it into their coding agent with a single command — no clone, no setup script, no account:
+
+```bash
+npx skills add duolahypercho/startup-kit
+```
+
+This uses the open [`skills`](https://github.com/vercel-labs/skills) CLI, which reads the repo straight from GitHub and copies the skill into whichever agent you choose. It works across **Cursor, Claude Code, Codex, Gemini CLI, Windsurf, and many more** — the CLI detects your installed agents and asks which to target.
+
+Useful flags:
+
+- `--global` / `-g` — install for all your projects (into your user skills dir) instead of just the current repo.
+- `--agent <name>` / `-a` — target a specific agent, e.g. `--agent claude-code` or `--agent cursor`.
+- `--yes` / `-y` — skip the prompts (handy in scripts/CI).
+- `--list` — show what's in the repo without installing.
+
+```bash
+# Install globally into Claude Code, no prompts:
+npx skills add duolahypercho/startup-kit --global --agent claude-code --yes
+```
+
+To update later, re-run the same `npx skills add …` command, or use the clone-based `upgrade.sh` flow below.
+
+> **Prefer to manage the kit as one shared clone across every agent at once** (one folder, one `upgrade.sh` for all of them, plus optional update hooks)? Use the install method just below instead.
 
 ## Install across all your agents (and keep them updated)
 
