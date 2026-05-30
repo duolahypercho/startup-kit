@@ -272,6 +272,7 @@ scripts/                     create-app and asset/font/skill download helpers
 - `scripts/add-frontend.sh [backend-dir]`: add a themed Next.js frontend to an existing backend, restructuring into a workspace.
 - `scripts/adopt-monorepo.sh <frontend-dir> <backend-dir>`: restructure an existing frontend + backend into a monorepo in place (`git mv`, history preserved).
 - `scripts/install-deploy-clis.sh`: install the Vercel, Supabase, and Koyeb CLIs.
+- `scripts/install-stripe-cli.sh`: install the Stripe CLI (Homebrew, with an official-binary fallback) for local webhook testing — `stripe login`, `stripe listen`, `stripe trigger` (`references/payments.md`).
 - `scripts/download-sf-pro.sh`: download Apple's official SF Pro installer into `assets/fonts/vendor/`.
 - `scripts/download-lucide-icons.sh`, `download-simple-icons.sh`, `download-tabler-icons.sh`: refresh bundled icon sets.
 - `scripts/install-gsap-skills.sh`: install the official GreenSock GSAP skills when not already present.

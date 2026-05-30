@@ -6,9 +6,12 @@ Use Stripe for payments and subscriptions. Let Stripe own the card data and the 
 
 ```bash
 npm install stripe @stripe/stripe-js
+scripts/install-stripe-cli.sh   # installs the Stripe CLI for local webhook testing
 ```
 
 Keep keys in environment variables. The publishable key is client-safe; the secret key and webhook secret are server-only and must never reach the client.
+
+The Stripe CLI (`stripe login`, `stripe listen`, `stripe trigger`) lets you test webhooks against your local server without deploying. `install-stripe-cli.sh` installs it via Homebrew when available and falls back to the official release binary otherwise.
 
 ## Flow
 
